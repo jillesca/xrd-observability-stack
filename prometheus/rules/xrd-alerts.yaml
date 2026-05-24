@@ -1,6 +1,6 @@
 groups:
   - name: xrd-interface-alerts
-    interval: 30s
+    interval: 5s
     rules:
       # SC-01 — Physical interface operationally DOWN (non-loopback, non-management)
       # Source label: the gNMIc target name (e.g. "xrd-1")
@@ -11,7 +11,7 @@ groups:
           openconfig_interfaces_interface_state_oper_status{
             name!~"Loopback.*|MgmtEth.*"
           } < 1
-        for: 15s
+        for: 0s
         labels:
           severity: critical
           event_type: interface_state
@@ -23,7 +23,7 @@ groups:
             DOWN (oper_status={{ $value }}).
 
   - name: xrd-isis-alerts
-    interval: 30s
+    interval: 5s
     rules:
       # SC-01 cascade — Count of ISIS adjacencies NOT in UP state.
       # Alertmanager inhibit_rules suppress this when XRdInterfaceDown fires for the
@@ -40,7 +40,7 @@ groups:
               }
             ) or vector(0)
           ) > 0
-        for: 15s
+        for: 5s
         labels:
           severity: warning
           event_type: isis_adjacency_count
@@ -64,7 +64,7 @@ groups:
               }
             ) or vector(0)
           ) >= 3
-        for: 15s
+        for: 10s
         labels:
           severity: critical
           event_type: topology_degraded
@@ -77,7 +77,7 @@ groups:
             failure or network partitioning event.
 
   - name: xrd-bgp-alerts
-    interval: 30s
+    interval: 10s
     rules:
       # SC-02 — BGP session not ESTABLISHED.
       # Verified metric: Cisco_IOS_XR_ipv4_bgp_oper_bgp_instances_instance_instance_active_default_vrf_neighbors_neighbor_connection_state
@@ -86,7 +86,7 @@ groups:
         expr: >
           Cisco_IOS_XR_ipv4_bgp_oper_bgp_instances_instance_instance_active_default_vrf_neighbors_neighbor_connection_state
           != 1
-        for: 30s
+        for: 15s
         labels:
           severity: critical
           event_type: bgp_session_state
@@ -100,7 +100,7 @@ groups:
             ESTABLISHED (connection_state={{ $value }}).
 
   - name: xrd-interface-stability
-    interval: 30s
+    interval: 10s
     rules:
       # SC-03 — Interface flapping: more than 3 state changes in 5 minutes.
       # Alertmanager inhibit_rules suppress this when XRdInterfaceDown fires for the
@@ -133,7 +133,7 @@ groups:
               name!~"Loopback.*|MgmtEth.*"
             }[5m]
           ) > 10
-        for: 60s
+        for: 30s
         labels:
           severity: warning
           event_type: interface_errors

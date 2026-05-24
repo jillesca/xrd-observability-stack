@@ -1,7 +1,11 @@
+global:
+  scrape_interval: 10s
+  evaluation_interval: 10s
+
 scrape_configs:
   - job_name: prometheus
     honor_timestamps: true
-    scrape_interval: 15s
+    scrape_interval: 10s
     scrape_timeout: 5s
     metrics_path: /metrics
     scheme: http
@@ -17,10 +21,6 @@ scrape_configs:
     static_configs:
       - targets:
           - nats-exporter:7777
-#  - job_name: clickhouse
-#    static_configs:
-#      - targets:
-#        - clab-gnp-stack-clickhouse:9363
 
 alerting:
   alertmanagers:
