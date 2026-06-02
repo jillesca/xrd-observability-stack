@@ -5,5 +5,10 @@ providers:
     folder: gnp-stack
     type: file
     options:
-      path:
-        /var/lib/grafana/dashboards/gnp-stack
+      path: /var/lib/grafana/dashboards/gnp-stack
+
+  - name: XRd
+    folder: XRd SR Topology
+    type: file
+    options:
+      path: /var/lib/grafana/dashboards/xrd

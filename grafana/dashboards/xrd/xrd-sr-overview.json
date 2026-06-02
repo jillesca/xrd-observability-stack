@@ -1,0 +1,3090 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      },
+      {
+        "datasource": {
+          "type": "loki",
+          "uid": "loki"
+        },
+        "enable": true,
+        "expr": "{job=\"xrd-syslog\"} |~ `%ROUTING-ISIS-5-ADJCHANGE` | regexp `Adjacency to (?P<neighbor>\\S+) \\((?P<iface>[^)]+)\\) \\((?P<level>L[12])\\) (?P<direction>Down|Up), (?P<reason>.+)`",
+        "hide": false,
+        "iconColor": "#FF780A",
+        "name": "ISIS Adjacency Change",
+        "step": "60s",
+        "titleFormat": "ISIS {{direction}}: {{hostname}} \u2192 {{neighbor}}",
+        "textFormat": "Interface: {{iface}} | {{level}} | Reason: {{reason}}",
+        "tagKeys": "hostname",
+        "useValueForTime": false
+      },
+      {
+        "datasource": {
+          "type": "loki",
+          "uid": "loki"
+        },
+        "enable": true,
+        "expr": "{job=\"xrd-syslog\"} |~ `%ROUTING-BGP-[35]-ADJCHANGE|%BGP-[35]-ADJCHANGE` | regexp `(?P<bgp_facility>%[A-Z_]+-BGP-[0-9]+-ADJCHANGE).*neighbor (?P<neighbor>\\S+).*(?P<direction>Up|Down)`",
+        "hide": false,
+        "iconColor": "#5794F2",
+        "name": "BGP Adjacency Change",
+        "step": "60s",
+        "titleFormat": "BGP {{direction}}: {{hostname}} \u2192 {{neighbor}}",
+        "textFormat": "{{bgp_facility}}",
+        "tagKeys": "hostname",
+        "useValueForTime": false
+      },
+      {
+        "datasource": {
+          "type": "loki",
+          "uid": "loki"
+        },
+        "enable": true,
+        "expr": "{job=\"xrd-syslog\"} |~ `%PKT_INFRA-LINK-3-UPDOWN|%PKT_INFRA-LINEPROTO-5-UPDOWN` | regexp `Interface (?P<iface>\\S+),.*(?P<direction>changed state to [a-z]+)`",
+        "hide": false,
+        "iconColor": "#F2495C",
+        "name": "Link Up/Down",
+        "step": "60s",
+        "titleFormat": "Link {{direction}}: {{hostname}} - {{iface}}",
+        "textFormat": "{{iface}} {{direction}} on {{hostname}}",
+        "tagKeys": "hostname",
+        "useValueForTime": false
+      },
+      {
+        "datasource": {
+          "type": "loki",
+          "uid": "loki"
+        },
+        "enable": true,
+        "expr": "{job=\"xrd-syslog\", severity=~\"[0-3]\"} |~ `%SYS-|%PLATFORM-` | regexp `%(?P<facility>[A-Z0-9_]+-[A-Z0-9_]+)-(?P<xr_sev>[0-3])-(?P<mnemonic>[A-Z0-9_]+)\\s*:\\s*(?P<body>.+)`",
+        "hide": false,
+        "iconColor": "#E02F44",
+        "name": "System/Platform Events",
+        "step": "60s",
+        "titleFormat": "{{hostname}}: %{{facility}}-{{xr_sev}}-{{mnemonic}}",
+        "textFormat": "{{body}}",
+        "tagKeys": "hostname,severity",
+        "useValueForTime": false
+      },
+      {
+        "datasource": {
+          "type": "loki",
+          "uid": "loki"
+        },
+        "enable": true,
+        "expr": "{job=\"xrd-syslog\"} |~ `%MPLS_LSD-[0-5]-` | regexp `%MPLS_LSD-(?P<xr_sev>[0-5])-(?P<mnemonic>[A-Z0-9_]+)\\s*:\\s*(?P<body>.+)`",
+        "hide": false,
+        "iconColor": "#FADE2A",
+        "name": "MPLS Events",
+        "step": "60s",
+        "titleFormat": "MPLS {{hostname}}: {{mnemonic}}",
+        "textFormat": "{{body}}",
+        "tagKeys": "hostname",
+        "useValueForTime": false
+      }
+    ]
+  },
+  "description": "Single-pane-of-glass for XRd Segment Routing topology. Covers interfaces, ISIS, BGP, MPLS SR, and syslog.",
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": 8,
+  "links": [],
+  "panels": [
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 1,
+      "panels": [],
+      "title": "Network Health",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "description": "Total number of XRd devices actively reporting telemetry",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "#73BF69",
+            "mode": "fixed"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#73BF69",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 3,
+        "x": 0,
+        "y": 1
+      },
+      "id": 100,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.3.5",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "count(count by (source) (openconfig_interfaces_interface_state_oper_status{source=~\"$device\"}))",
+          "legendFormat": "",
+          "refId": "A"
+        }
+      ],
+      "title": "Devices Monitored",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": 0
+              },
+              {
+                "color": "green",
+                "value": 1
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 3,
+        "x": 3,
+        "y": 1
+      },
+      "id": 2,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.3.5",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "count(openconfig_interfaces_interface_state_oper_status{source=~\"$device\"} == 1)",
+          "legendFormat": "UP",
+          "refId": "A"
+        }
+      ],
+      "title": "Interfaces UP",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 1
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 3,
+        "x": 6,
+        "y": 1
+      },
+      "id": 3,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.3.5",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "count(openconfig_interfaces_interface_state_oper_status{source=~\"$device\"} == 0) or vector(0)",
+          "legendFormat": "DOWN",
+          "refId": "A"
+        }
+      ],
+      "title": "Interfaces DOWN",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": 0
+              },
+              {
+                "color": "green",
+                "value": 1
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 3,
+        "x": 9,
+        "y": 1
+      },
+      "id": 4,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.3.5",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "count(Cisco_IOS_XR_clns_isis_oper_isis_instances_instance_neighbors_neighbor_neighbor_state{source=~\"$device\", neighbor_state!~\".*down.*\"})",
+          "legendFormat": "UP",
+          "refId": "A"
+        }
+      ],
+      "title": "ISIS Adjacencies UP",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 1
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 3,
+        "x": 12,
+        "y": 1
+      },
+      "id": 5,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.3.5",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "count(Cisco_IOS_XR_clns_isis_oper_isis_instances_instance_neighbors_neighbor_neighbor_state{source=~\"$device\", neighbor_state=~\".*down.*\"}) or vector(0)",
+          "legendFormat": "DOWN",
+          "refId": "A"
+        }
+      ],
+      "title": "ISIS Adjacencies DOWN",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": 0
+              },
+              {
+                "color": "green",
+                "value": 1
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 3,
+        "x": 15,
+        "y": 1
+      },
+      "id": 6,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.3.5",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "count(max by (source, neighbor_neighbor_address) (Cisco_IOS_XR_ipv4_bgp_oper_bgp_instances_instance_instance_active_default_vrf_neighbors_neighbor_connection_state{source=~\"$device\"} == 1))",
+          "legendFormat": "Established",
+          "refId": "A"
+        }
+      ],
+      "title": "BGP Sessions UP",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 1
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 3,
+        "x": 18,
+        "y": 1
+      },
+      "id": 7,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.3.5",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "count(max by (source, neighbor_neighbor_address) (Cisco_IOS_XR_ipv4_bgp_oper_bgp_instances_instance_instance_active_default_vrf_neighbors_neighbor_connection_state{source=~\"$device\"} == 0)) or vector(0)",
+          "legendFormat": "Not Established",
+          "refId": "A"
+        }
+      ],
+      "title": "BGP Sessions DOWN",
+      "type": "stat"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 5
+      },
+      "id": 101,
+      "panels": [],
+      "title": "Alert Scenario",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "description": "Live XRd SR topology. Node borders and link colors reflect interface oper-state (green=UP, red=DOWN).",
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 20,
+        "w": 14,
+        "x": 0,
+        "y": 6
+      },
+      "id": 200,
+      "options": {
+        "animationControlEnabled": false,
+        "animationsEnabled": false,
+        "debuggingCtr": {
+          "colorsCtr": 0,
+          "dataCtr": 0,
+          "displaySvgCtr": 0,
+          "mappingsCtr": 0,
+          "timingsCtr": 0
+        },
+        "highlighterEnabled": true,
+        "highlighterSelection": "",
+        "panZoomEnabled": false,
+        "panelConfig": "---\nanchors:\n  thresholds-operstate: &thresholds-operstate\n    - color: \"#FF3154\"\n      level: 0\n    - color: \"#4BDD33\"\n      level: 1\n\ncellIdPreamble: \"\"\ncells:\n  node_xrd1:\n    dataRef: oper-state:xrd-1\n    fillColor:\n      thresholds: *thresholds-operstate\n  node_xrd2:\n    dataRef: oper-state:xrd-2\n    fillColor:\n      thresholds: *thresholds-operstate\n  node_xrd3:\n    dataRef: oper-state:xrd-3\n    fillColor:\n      thresholds: *thresholds-operstate\n  node_xrd4:\n    dataRef: oper-state:xrd-4\n    fillColor:\n      thresholds: *thresholds-operstate\n  node_xrd5:\n    dataRef: oper-state:xrd-5\n    fillColor:\n      thresholds: *thresholds-operstate\n  node_xrd6:\n    dataRef: oper-state:xrd-6\n    fillColor:\n      thresholds: *thresholds-operstate\n  node_xrd7:\n    dataRef: oper-state:xrd-7\n    fillColor:\n      thresholds: *thresholds-operstate\n  node_xrd8:\n    dataRef: oper-state:xrd-8\n    fillColor:\n      thresholds: *thresholds-operstate\n  link_xrd1_gi0_xrd3_gi2:\n    dataRef: link_xrd1_gi0_xrd3_gi2\n    strokeColor:\n      thresholds: *thresholds-operstate\n  link_xrd1_gi1_xrd5_gi2:\n    dataRef: link_xrd1_gi1_xrd5_gi2\n    strokeColor:\n      thresholds: *thresholds-operstate\n  link_xrd2_gi0_xrd4_gi2:\n    dataRef: link_xrd2_gi0_xrd4_gi2\n    strokeColor:\n      thresholds: *thresholds-operstate\n  link_xrd2_gi1_xrd6_gi2:\n    dataRef: link_xrd2_gi1_xrd6_gi2\n    strokeColor:\n      thresholds: *thresholds-operstate\n  link_xrd3_gi0_xrd4_gi0:\n    dataRef: link_xrd3_gi0_xrd4_gi0\n    strokeColor:\n      thresholds: *thresholds-operstate\n  link_xrd3_gi1_xrd5_gi1:\n    dataRef: link_xrd3_gi1_xrd5_gi1\n    strokeColor:\n      thresholds: *thresholds-operstate\n  link_xrd3_gi3_xrd7_gi0:\n    dataRef: link_xrd3_gi3_xrd7_gi0\n    strokeColor:\n      thresholds: *thresholds-operstate\n  link_xrd4_gi1_xrd6_gi1:\n    dataRef: link_xrd4_gi1_xrd6_gi1\n    strokeColor:\n      thresholds: *thresholds-operstate\n  link_xrd4_gi3_xrd7_gi1:\n    dataRef: link_xrd4_gi3_xrd7_gi1\n    strokeColor:\n      thresholds: *thresholds-operstate\n  link_xrd5_gi0_xrd6_gi0:\n    dataRef: link_xrd5_gi0_xrd6_gi0\n    strokeColor:\n      thresholds: *thresholds-operstate\n  link_xrd5_gi3_xrd8_gi0:\n    dataRef: link_xrd5_gi3_xrd8_gi0\n    strokeColor:\n      thresholds: *thresholds-operstate\n  link_xrd6_gi3_xrd8_gi1:\n    dataRef: link_xrd6_gi3_xrd8_gi1\n    strokeColor:\n      thresholds: *thresholds-operstate\n",
+        "siteConfig": "",
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 820 620\" width=\"820\" height=\"620\">\n  <defs>\n    <style>\n      .node-box { fill: #1a1a2e; stroke: #4a4a6a; stroke-width: 2; rx: 8; ry: 8; }\n      .node-label { fill: #ffffff; font-family: 'Segoe UI', sans-serif; font-size: 22px; font-weight: bold; text-anchor: middle; dominant-baseline: central; }\n      .node-role { fill: #aaaacc; font-family: 'Segoe UI', sans-serif; font-size: 13px; text-anchor: middle; dominant-baseline: central; }\n      .link { stroke-width: 3.5; fill: none; }\n      .port-label { fill: #88ddff; font-family: 'Segoe UI', sans-serif; font-size: 18px; font-weight: bold; text-anchor: middle; dominant-baseline: central; }\n    </style>\n  </defs>\n\n  <!-- Background -->\n  <rect width=\"820\" height=\"620\" fill=\"#181B1F\"/>\n\n  <!-- ═══════════════════ LINKS ═══════════════════ -->\n\n  <!-- xrd-1:Gi0/0/0/0 ↔ xrd-3:Gi0/0/0/2 -->\n  <line id=\"link_xrd1_gi0_xrd3_gi2\" class=\"link\" x1=\"200\" y1=\"300\" x2=\"290\" y2=\"190\" stroke=\"#4BDD33\"/>\n  <!-- xrd-1:Gi0/0/0/1 ↔ xrd-5:Gi0/0/0/2 -->\n  <line id=\"link_xrd1_gi1_xrd5_gi2\" class=\"link\" x1=\"200\" y1=\"330\" x2=\"290\" y2=\"430\" stroke=\"#4BDD33\"/>\n\n  <!-- xrd-2:Gi0/0/0/0 ↔ xrd-4:Gi0/0/0/2 -->\n  <line id=\"link_xrd2_gi0_xrd4_gi2\" class=\"link\" x1=\"620\" y1=\"300\" x2=\"530\" y2=\"190\" stroke=\"#4BDD33\"/>\n  <!-- xrd-2:Gi0/0/0/1 ↔ xrd-6:Gi0/0/0/2 -->\n  <line id=\"link_xrd2_gi1_xrd6_gi2\" class=\"link\" x1=\"620\" y1=\"330\" x2=\"530\" y2=\"430\" stroke=\"#4BDD33\"/>\n\n  <!-- xrd-3:Gi0/0/0/0 ↔ xrd-4:Gi0/0/0/0 -->\n  <line id=\"link_xrd3_gi0_xrd4_gi0\" class=\"link\" x1=\"335\" y1=\"170\" x2=\"485\" y2=\"170\" stroke=\"#4BDD33\"/>\n  <!-- xrd-3:Gi0/0/0/1 ↔ xrd-5:Gi0/0/0/1 -->\n  <line id=\"link_xrd3_gi1_xrd5_gi1\" class=\"link\" x1=\"290\" y1=\"210\" x2=\"290\" y2=\"410\" stroke=\"#4BDD33\"/>\n  <!-- xrd-3:Gi0/0/0/3 ↔ xrd-7:Gi0/0/0/0 -->\n  <line id=\"link_xrd3_gi3_xrd7_gi0\" class=\"link\" x1=\"320\" y1=\"150\" x2=\"380\" y2=\"90\" stroke=\"#4BDD33\"/>\n\n  <!-- xrd-4:Gi0/0/0/1 ↔ xrd-6:Gi0/0/0/1 -->\n  <line id=\"link_xrd4_gi1_xrd6_gi1\" class=\"link\" x1=\"530\" y1=\"210\" x2=\"530\" y2=\"410\" stroke=\"#4BDD33\"/>\n  <!-- xrd-4:Gi0/0/0/3 ↔ xrd-7:Gi0/0/0/1 -->\n  <line id=\"link_xrd4_gi3_xrd7_gi1\" class=\"link\" x1=\"500\" y1=\"150\" x2=\"440\" y2=\"90\" stroke=\"#4BDD33\"/>\n\n  <!-- xrd-5:Gi0/0/0/0 ↔ xrd-6:Gi0/0/0/0 -->\n  <line id=\"link_xrd5_gi0_xrd6_gi0\" class=\"link\" x1=\"335\" y1=\"450\" x2=\"485\" y2=\"450\" stroke=\"#4BDD33\"/>\n  <!-- xrd-5:Gi0/0/0/3 ↔ xrd-8:Gi0/0/0/0 -->\n  <line id=\"link_xrd5_gi3_xrd8_gi0\" class=\"link\" x1=\"320\" y1=\"470\" x2=\"380\" y2=\"540\" stroke=\"#4BDD33\"/>\n\n  <!-- xrd-6:Gi0/0/0/3 ↔ xrd-8:Gi0/0/0/1 -->\n  <line id=\"link_xrd6_gi3_xrd8_gi1\" class=\"link\" x1=\"500\" y1=\"470\" x2=\"440\" y2=\"540\" stroke=\"#4BDD33\"/>\n\n  <!-- ═══════════════════ PORT LABELS ═══════════════════ -->\n\n  <!-- xrd-1 ports -->\n  <text class=\"port-label\" x=\"222\" y=\"282\">G0</text>\n  <text class=\"port-label\" x=\"222\" y=\"348\">G1</text>\n\n  <!-- xrd-2 ports -->\n  <text class=\"port-label\" x=\"598\" y=\"282\">G0</text>\n  <text class=\"port-label\" x=\"598\" y=\"348\">G1</text>\n\n  <!-- xrd-3 ports: G0→xrd4, G1→xrd5, G2→xrd1, G3→xrd7 -->\n  <text class=\"port-label\" x=\"350\" y=\"158\">G0</text>\n  <text class=\"port-label\" x=\"272\" y=\"225\">G1</text>\n  <text class=\"port-label\" x=\"272\" y=\"190\">G2</text>\n  <text class=\"port-label\" x=\"302\" y=\"135\">G3</text>\n\n  <!-- xrd-4 ports: G0→xrd3, G1→xrd6, G2→xrd2, G3→xrd7 -->\n  <text class=\"port-label\" x=\"470\" y=\"158\">G0</text>\n  <text class=\"port-label\" x=\"548\" y=\"225\">G1</text>\n  <text class=\"port-label\" x=\"548\" y=\"190\">G2</text>\n  <text class=\"port-label\" x=\"518\" y=\"135\">G3</text>\n\n  <!-- xrd-5 ports: G0→xrd6, G1→xrd3, G2→xrd1, G3→xrd8 -->\n  <text class=\"port-label\" x=\"350\" y=\"462\">G0</text>\n  <text class=\"port-label\" x=\"272\" y=\"395\">G1</text>\n  <text class=\"port-label\" x=\"272\" y=\"430\">G2</text>\n  <text class=\"port-label\" x=\"302\" y=\"485\">G3</text>\n\n  <!-- xrd-6 ports: G0→xrd5, G1→xrd4, G2→xrd2, G3→xrd8 -->\n  <text class=\"port-label\" x=\"470\" y=\"462\">G0</text>\n  <text class=\"port-label\" x=\"548\" y=\"395\">G1</text>\n  <text class=\"port-label\" x=\"548\" y=\"430\">G2</text>\n  <text class=\"port-label\" x=\"518\" y=\"485\">G3</text>\n\n  <!-- xrd-7 ports: G0→xrd3, G1→xrd4 -->\n  <text class=\"port-label\" x=\"383\" y=\"102\">G0</text>\n  <text class=\"port-label\" x=\"437\" y=\"102\">G1</text>\n\n  <!-- xrd-8 ports: G0→xrd5, G1→xrd6 -->\n  <text class=\"port-label\" x=\"383\" y=\"528\">G0</text>\n  <text class=\"port-label\" x=\"437\" y=\"528\">G1</text>\n\n  <!-- ═══════════════════ NODES ═══════════════════ -->\n\n  <!-- xrd-7 (PCE) - top center -->\n  <rect id=\"node_xrd7\" class=\"node-box\" x=\"365\" y=\"42\" width=\"90\" height=\"50\"/>\n  <text class=\"node-label\" x=\"410\" y=\"60\">xrd-7</text>\n  <text class=\"node-role\" x=\"410\" y=\"80\">PCE</text>\n\n  <!-- xrd-3 - upper left -->\n  <rect id=\"node_xrd3\" class=\"node-box\" x=\"245\" y=\"150\" width=\"90\" height=\"50\"/>\n  <text class=\"node-label\" x=\"290\" y=\"178\">xrd-3</text>\n\n  <!-- xrd-4 - upper right -->\n  <rect id=\"node_xrd4\" class=\"node-box\" x=\"485\" y=\"150\" width=\"90\" height=\"50\"/>\n  <text class=\"node-label\" x=\"530\" y=\"178\">xrd-4</text>\n\n  <!-- xrd-1 - middle left (src) -->\n  <rect id=\"node_xrd1\" class=\"node-box\" x=\"145\" y=\"285\" width=\"90\" height=\"50\"/>\n  <text class=\"node-label\" x=\"190\" y=\"305\">xrd-1</text>\n  <text class=\"node-role\" x=\"190\" y=\"325\">src</text>\n\n  <!-- xrd-2 - middle right (dst) -->\n  <rect id=\"node_xrd2\" class=\"node-box\" x=\"585\" y=\"285\" width=\"90\" height=\"50\"/>\n  <text class=\"node-label\" x=\"630\" y=\"305\">xrd-2</text>\n  <text class=\"node-role\" x=\"630\" y=\"325\">dst</text>\n\n  <!-- xrd-5 - lower left -->\n  <rect id=\"node_xrd5\" class=\"node-box\" x=\"245\" y=\"420\" width=\"90\" height=\"50\"/>\n  <text class=\"node-label\" x=\"290\" y=\"448\">xrd-5</text>\n\n  <!-- xrd-6 - lower right -->\n  <rect id=\"node_xrd6\" class=\"node-box\" x=\"485\" y=\"420\" width=\"90\" height=\"50\"/>\n  <text class=\"node-label\" x=\"530\" y=\"448\">xrd-6</text>\n\n  <!-- xrd-8 (vRR) - bottom center -->\n  <rect id=\"node_xrd8\" class=\"node-box\" x=\"365\" y=\"535\" width=\"90\" height=\"50\"/>\n  <text class=\"node-label\" x=\"410\" y=\"553\">xrd-8</text>\n  <text class=\"node-role\" x=\"410\" y=\"573\">vRR</text>\n\n  <!-- ═══════════════════ LEGEND ═══════════════════ -->\n  <rect x=\"18\" y=\"18\" width=\"140\" height=\"90\" fill=\"#1a1a2e\" stroke=\"#4a4a6a\" rx=\"4\"/>\n  <circle cx=\"38\" cy=\"40\" r=\"8\" fill=\"#4BDD33\"/>\n  <text x=\"55\" y=\"44\" fill=\"#ccc\" font-size=\"20\" font-family=\"sans-serif\">Link UP</text>\n  <circle cx=\"38\" cy=\"64\" r=\"8\" fill=\"#FF3154\"/>\n  <text x=\"55\" y=\"68\" fill=\"#ccc\" font-size=\"20\" font-family=\"sans-serif\">Link DOWN</text>\n  <circle cx=\"38\" cy=\"88\" r=\"8\" fill=\"#808080\"/>\n  <text x=\"55\" y=\"92\" fill=\"#ccc\" font-size=\"20\" font-family=\"sans-serif\">No data</text>\n</svg>\n",
+        "svgDimming": true,
+        "testDataEnabled": false,
+        "timeSliderEnabled": false,
+        "timeSliderMode": "local"
+      },
+      "pluginVersion": "1.20.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "min by (source) (openconfig_interfaces_interface_state_oper_status{source=~\"xrd-.*\", name!~\"Loopback.*|MgmtEth.*|Null0\"})",
+          "instant": true,
+          "legendFormat": "oper-state:{{source}}",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "openconfig_interfaces_interface_state_oper_status{source=~\"xrd-.*\", name!~\"Loopback.*|MgmtEth.*|Null0\"}",
+          "instant": true,
+          "legendFormat": "oper-state:{{source}}:{{name}}",
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "min by (link_id) (\n  label_replace(openconfig_interfaces_interface_state_oper_status{source=\"xrd-1\",name=\"GigabitEthernet0/0/0/0\"},\"link_id\",\"link_xrd1_gi0_xrd3_gi2\",\"\",\"\") or\n  label_replace(openconfig_interfaces_interface_state_oper_status{source=\"xrd-3\",name=\"GigabitEthernet0/0/0/2\"},\"link_id\",\"link_xrd1_gi0_xrd3_gi2\",\"\",\"\") or\n  label_replace(openconfig_interfaces_interface_state_oper_status{source=\"xrd-1\",name=\"GigabitEthernet0/0/0/1\"},\"link_id\",\"link_xrd1_gi1_xrd5_gi2\",\"\",\"\") or\n  label_replace(openconfig_interfaces_interface_state_oper_status{source=\"xrd-5\",name=\"GigabitEthernet0/0/0/2\"},\"link_id\",\"link_xrd1_gi1_xrd5_gi2\",\"\",\"\") or\n  label_replace(openconfig_interfaces_interface_state_oper_status{source=\"xrd-2\",name=\"GigabitEthernet0/0/0/0\"},\"link_id\",\"link_xrd2_gi0_xrd4_gi2\",\"\",\"\") or\n  label_replace(openconfig_interfaces_interface_state_oper_status{source=\"xrd-4\",name=\"GigabitEthernet0/0/0/2\"},\"link_id\",\"link_xrd2_gi0_xrd4_gi2\",\"\",\"\") or\n  label_replace(openconfig_interfaces_interface_state_oper_status{source=\"xrd-2\",name=\"GigabitEthernet0/0/0/1\"},\"link_id\",\"link_xrd2_gi1_xrd6_gi2\",\"\",\"\") or\n  label_replace(openconfig_interfaces_interface_state_oper_status{source=\"xrd-6\",name=\"GigabitEthernet0/0/0/2\"},\"link_id\",\"link_xrd2_gi1_xrd6_gi2\",\"\",\"\") or\n  label_replace(openconfig_interfaces_interface_state_oper_status{source=\"xrd-3\",name=\"GigabitEthernet0/0/0/0\"},\"link_id\",\"link_xrd3_gi0_xrd4_gi0\",\"\",\"\") or\n  label_replace(openconfig_interfaces_interface_state_oper_status{source=\"xrd-4\",name=\"GigabitEthernet0/0/0/0\"},\"link_id\",\"link_xrd3_gi0_xrd4_gi0\",\"\",\"\") or\n  label_replace(openconfig_interfaces_interface_state_oper_status{source=\"xrd-3\",name=\"GigabitEthernet0/0/0/1\"},\"link_id\",\"link_xrd3_gi1_xrd5_gi1\",\"\",\"\") or\n  label_replace(openconfig_interfaces_interface_state_oper_status{source=\"xrd-5\",name=\"GigabitEthernet0/0/0/1\"},\"link_id\",\"link_xrd3_gi1_xrd5_gi1\",\"\",\"\") or\n  label_replace(openconfig_interfaces_interface_state_oper_status{source=\"xrd-3\",name=\"GigabitEthernet0/0/0/3\"},\"link_id\",\"link_xrd3_gi3_xrd7_gi0\",\"\",\"\") or\n  label_replace(openconfig_interfaces_interface_state_oper_status{source=\"xrd-7\",name=\"GigabitEthernet0/0/0/0\"},\"link_id\",\"link_xrd3_gi3_xrd7_gi0\",\"\",\"\") or\n  label_replace(openconfig_interfaces_interface_state_oper_status{source=\"xrd-4\",name=\"GigabitEthernet0/0/0/1\"},\"link_id\",\"link_xrd4_gi1_xrd6_gi1\",\"\",\"\") or\n  label_replace(openconfig_interfaces_interface_state_oper_status{source=\"xrd-6\",name=\"GigabitEthernet0/0/0/1\"},\"link_id\",\"link_xrd4_gi1_xrd6_gi1\",\"\",\"\") or\n  label_replace(openconfig_interfaces_interface_state_oper_status{source=\"xrd-4\",name=\"GigabitEthernet0/0/0/3\"},\"link_id\",\"link_xrd4_gi3_xrd7_gi1\",\"\",\"\") or\n  label_replace(openconfig_interfaces_interface_state_oper_status{source=\"xrd-7\",name=\"GigabitEthernet0/0/0/1\"},\"link_id\",\"link_xrd4_gi3_xrd7_gi1\",\"\",\"\") or\n  label_replace(openconfig_interfaces_interface_state_oper_status{source=\"xrd-5\",name=\"GigabitEthernet0/0/0/0\"},\"link_id\",\"link_xrd5_gi0_xrd6_gi0\",\"\",\"\") or\n  label_replace(openconfig_interfaces_interface_state_oper_status{source=\"xrd-6\",name=\"GigabitEthernet0/0/0/0\"},\"link_id\",\"link_xrd5_gi0_xrd6_gi0\",\"\",\"\") or\n  label_replace(openconfig_interfaces_interface_state_oper_status{source=\"xrd-5\",name=\"GigabitEthernet0/0/0/3\"},\"link_id\",\"link_xrd5_gi3_xrd8_gi0\",\"\",\"\") or\n  label_replace(openconfig_interfaces_interface_state_oper_status{source=\"xrd-8\",name=\"GigabitEthernet0/0/0/0\"},\"link_id\",\"link_xrd5_gi3_xrd8_gi0\",\"\",\"\") or\n  label_replace(openconfig_interfaces_interface_state_oper_status{source=\"xrd-6\",name=\"GigabitEthernet0/0/0/3\"},\"link_id\",\"link_xrd6_gi3_xrd8_gi1\",\"\",\"\") or\n  label_replace(openconfig_interfaces_interface_state_oper_status{source=\"xrd-8\",name=\"GigabitEthernet0/0/0/1\"},\"link_id\",\"link_xrd6_gi3_xrd8_gi1\",\"\",\"\")\n)",
+          "instant": true,
+          "legendFormat": "{{link_id}}",
+          "refId": "C"
+        }
+      ],
+      "title": "Network Topology",
+      "type": "andrewbmchugh-flow-panel"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "description": "Matrix view: rows=devices, columns=GigabitEthernet interfaces. Green=UP, Red=DOWN, Gray=not present on device.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "center",
+            "cellOptions": {
+              "mode": "basic",
+              "type": "color-background"
+            },
+            "footer": {
+              "reducers": []
+            },
+            "inspect": false,
+            "minWidth": 40,
+            "width": 50,
+            "wrapText": false
+          },
+          "displayName": "${__field.name}",
+          "mappings": [
+            {
+              "options": {
+                "0": {
+                  "color": "dark-red",
+                  "index": 0,
+                  "text": "DOWN"
+                },
+                "1": {
+                  "color": "dark-green",
+                  "index": 1,
+                  "text": "UP"
+                }
+              },
+              "type": "value"
+            },
+            {
+              "options": {
+                "match": "null+nan",
+                "result": {
+                  "color": "dark-gray",
+                  "index": 2,
+                  "text": "N/A"
+                }
+              },
+              "type": "special"
+            }
+          ],
+          "noValue": "",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "dark-gray",
+                "value": 0
+              },
+              {
+                "color": "dark-red",
+                "value": 0
+              },
+              {
+                "color": "dark-green",
+                "value": 1
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "source\\\\.*"
+            },
+            "properties": [
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "auto"
+                }
+              },
+              {
+                "id": "custom.width",
+                "value": 70
+              },
+              {
+                "id": "custom.align",
+                "value": "left"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 10,
+        "x": 14,
+        "y": 6
+      },
+      "id": 300,
+      "options": {
+        "cellHeight": "sm",
+        "showHeader": true
+      },
+      "pluginVersion": "12.3.5",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "expr": "openconfig_interfaces_interface_state_oper_status{source=~\"$device\", name=~\"GigabitEthernet0/0/0/.*\"}",
+          "format": "table",
+          "instant": true,
+          "legendFormat": "__auto",
+          "range": false,
+          "refId": "A"
+        }
+      ],
+      "title": "Interface State Matrix",
+      "transformations": [
+        {
+          "id": "groupingToMatrix",
+          "options": {
+            "columnField": "name",
+            "emptyValue": "null",
+            "rowField": "source",
+            "valueField": "Value"
+          }
+        },
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "GigabitEthernet0/0/0/(.*)",
+            "renamePattern": "G$1"
+          }
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "fields": {},
+            "sort": [
+              {
+                "desc": false,
+                "field": "source\\name"
+              }
+            ]
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {},
+            "indexByName": {
+              "source\\name": 0,
+              "G0": 1,
+              "G1": 2,
+              "G2": 3,
+              "G3": 4
+            },
+            "renameByName": {}
+          }
+        }
+      ],
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "description": "State of all 12 physical links over time. Green=UP, Red=DOWN. Uses min() of both endpoints — a link shows DOWN if either interface reports 0. Port-qualified labels identify the exact interface pair per link. Topology changes require updating the pairs in this query.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "axisPlacement": "auto",
+            "fillOpacity": 70,
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineWidth": 1,
+            "spanNulls": false
+          },
+          "mappings": [
+            {
+              "options": {
+                "0": {
+                  "color": "red",
+                  "index": 0,
+                  "text": "DOWN"
+                },
+                "1": {
+                  "color": "green",
+                  "index": 1,
+                  "text": "UP"
+                }
+              },
+              "type": "value"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": 0
+              },
+              {
+                "color": "green",
+                "value": 1
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 26
+      },
+      "id": 102,
+      "options": {
+        "colWidth": 0.9,
+        "legend": {
+          "displayMode": "hidden",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "rowHeight": 0.85,
+        "showValue": "never",
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.3.5",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "expr": "min by (link) (\n  label_replace(openconfig_interfaces_interface_state_oper_status{source=\"xrd-1\",name=\"GigabitEthernet0/0/0/0\"},\"link\",\"xrd-1:Gi0 — xrd-3:Gi2\",\"\",\"\") or\n  label_replace(openconfig_interfaces_interface_state_oper_status{source=\"xrd-3\",name=\"GigabitEthernet0/0/0/2\"},\"link\",\"xrd-1:Gi0 — xrd-3:Gi2\",\"\",\"\") or\n  label_replace(openconfig_interfaces_interface_state_oper_status{source=\"xrd-1\",name=\"GigabitEthernet0/0/0/1\"},\"link\",\"xrd-1:Gi1 — xrd-5:Gi2\",\"\",\"\") or\n  label_replace(openconfig_interfaces_interface_state_oper_status{source=\"xrd-5\",name=\"GigabitEthernet0/0/0/2\"},\"link\",\"xrd-1:Gi1 — xrd-5:Gi2\",\"\",\"\") or\n  label_replace(openconfig_interfaces_interface_state_oper_status{source=\"xrd-2\",name=\"GigabitEthernet0/0/0/0\"},\"link\",\"xrd-2:Gi0 — xrd-4:Gi2\",\"\",\"\") or\n  label_replace(openconfig_interfaces_interface_state_oper_status{source=\"xrd-4\",name=\"GigabitEthernet0/0/0/2\"},\"link\",\"xrd-2:Gi0 — xrd-4:Gi2\",\"\",\"\") or\n  label_replace(openconfig_interfaces_interface_state_oper_status{source=\"xrd-2\",name=\"GigabitEthernet0/0/0/1\"},\"link\",\"xrd-2:Gi1 — xrd-6:Gi2\",\"\",\"\") or\n  label_replace(openconfig_interfaces_interface_state_oper_status{source=\"xrd-6\",name=\"GigabitEthernet0/0/0/2\"},\"link\",\"xrd-2:Gi1 — xrd-6:Gi2\",\"\",\"\") or\n  label_replace(openconfig_interfaces_interface_state_oper_status{source=\"xrd-3\",name=\"GigabitEthernet0/0/0/0\"},\"link\",\"xrd-3:Gi0 — xrd-4:Gi0\",\"\",\"\") or\n  label_replace(openconfig_interfaces_interface_state_oper_status{source=\"xrd-4\",name=\"GigabitEthernet0/0/0/0\"},\"link\",\"xrd-3:Gi0 — xrd-4:Gi0\",\"\",\"\") or\n  label_replace(openconfig_interfaces_interface_state_oper_status{source=\"xrd-3\",name=\"GigabitEthernet0/0/0/1\"},\"link\",\"xrd-3:Gi1 — xrd-5:Gi1\",\"\",\"\") or\n  label_replace(openconfig_interfaces_interface_state_oper_status{source=\"xrd-5\",name=\"GigabitEthernet0/0/0/1\"},\"link\",\"xrd-3:Gi1 — xrd-5:Gi1\",\"\",\"\") or\n  label_replace(openconfig_interfaces_interface_state_oper_status{source=\"xrd-3\",name=\"GigabitEthernet0/0/0/3\"},\"link\",\"xrd-3:Gi3 — xrd-7:Gi0\",\"\",\"\") or\n  label_replace(openconfig_interfaces_interface_state_oper_status{source=\"xrd-7\",name=\"GigabitEthernet0/0/0/0\"},\"link\",\"xrd-3:Gi3 — xrd-7:Gi0\",\"\",\"\") or\n  label_replace(openconfig_interfaces_interface_state_oper_status{source=\"xrd-4\",name=\"GigabitEthernet0/0/0/1\"},\"link\",\"xrd-4:Gi1 — xrd-6:Gi1\",\"\",\"\") or\n  label_replace(openconfig_interfaces_interface_state_oper_status{source=\"xrd-6\",name=\"GigabitEthernet0/0/0/1\"},\"link\",\"xrd-4:Gi1 — xrd-6:Gi1\",\"\",\"\") or\n  label_replace(openconfig_interfaces_interface_state_oper_status{source=\"xrd-4\",name=\"GigabitEthernet0/0/0/3\"},\"link\",\"xrd-4:Gi3 — xrd-7:Gi1\",\"\",\"\") or\n  label_replace(openconfig_interfaces_interface_state_oper_status{source=\"xrd-7\",name=\"GigabitEthernet0/0/0/1\"},\"link\",\"xrd-4:Gi3 — xrd-7:Gi1\",\"\",\"\") or\n  label_replace(openconfig_interfaces_interface_state_oper_status{source=\"xrd-5\",name=\"GigabitEthernet0/0/0/0\"},\"link\",\"xrd-5:Gi0 — xrd-6:Gi0\",\"\",\"\") or\n  label_replace(openconfig_interfaces_interface_state_oper_status{source=\"xrd-6\",name=\"GigabitEthernet0/0/0/0\"},\"link\",\"xrd-5:Gi0 — xrd-6:Gi0\",\"\",\"\") or\n  label_replace(openconfig_interfaces_interface_state_oper_status{source=\"xrd-5\",name=\"GigabitEthernet0/0/0/3\"},\"link\",\"xrd-5:Gi3 — xrd-8:Gi0\",\"\",\"\") or\n  label_replace(openconfig_interfaces_interface_state_oper_status{source=\"xrd-8\",name=\"GigabitEthernet0/0/0/0\"},\"link\",\"xrd-5:Gi3 — xrd-8:Gi0\",\"\",\"\") or\n  label_replace(openconfig_interfaces_interface_state_oper_status{source=\"xrd-6\",name=\"GigabitEthernet0/0/0/3\"},\"link\",\"xrd-6:Gi3 — xrd-8:Gi1\",\"\",\"\") or\n  label_replace(openconfig_interfaces_interface_state_oper_status{source=\"xrd-8\",name=\"GigabitEthernet0/0/0/1\"},\"link\",\"xrd-6:Gi3 — xrd-8:Gi1\",\"\",\"\")\n)",
+          "instant": false,
+          "legendFormat": "{{link}}",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Physical Link State",
+      "type": "status-history"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "description": "State of all 12 ISIS adjacency pairs over time. Green=UP, Red=DOWN. Uses static topology pairs with or vector(0) fallback: XR removes a neighbor from its YANG table when the adjacency drops (no DOWN state is emitted), so the fallback ensures rows remain visible as DOWN rather than disappearing. Topology changes require updating the pairs in this query — see ADR-001.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "axisPlacement": "auto",
+            "fillOpacity": 70,
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineWidth": 1,
+            "spanNulls": false
+          },
+          "mappings": [
+            {
+              "options": {
+                "0": {
+                  "color": "red",
+                  "index": 0,
+                  "text": "DOWN"
+                },
+                "1": {
+                  "color": "green",
+                  "index": 1,
+                  "text": "UP"
+                }
+              },
+              "type": "value"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": 0
+              },
+              {
+                "color": "green",
+                "value": 1
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 10,
+        "x": 14,
+        "y": 16
+      },
+      "id": 21,
+      "options": {
+        "colWidth": 0.9,
+        "legend": {
+          "displayMode": "hidden",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "rowHeight": 0.85,
+        "showValue": "never",
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.3.5",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "expr": "label_replace((count(last_over_time(Cisco_IOS_XR_clns_isis_oper_isis_instances_instance_neighbors_neighbor_neighbor_state{source=\"xrd-1\",neighbor_neighbor_system_id=\"0100.0100.0103\"}[15s])) or vector(0)) * (count(last_over_time(Cisco_IOS_XR_clns_isis_oper_isis_instances_instance_neighbors_neighbor_neighbor_state{source=\"xrd-3\",neighbor_neighbor_system_id=\"0100.0100.0101\"}[15s])) or vector(0)),\"pair\",\"xrd-1 ↔ xrd-3\",\"\",\"\")\nor\nlabel_replace((count(last_over_time(Cisco_IOS_XR_clns_isis_oper_isis_instances_instance_neighbors_neighbor_neighbor_state{source=\"xrd-1\",neighbor_neighbor_system_id=\"0100.0100.0105\"}[15s])) or vector(0)) * (count(last_over_time(Cisco_IOS_XR_clns_isis_oper_isis_instances_instance_neighbors_neighbor_neighbor_state{source=\"xrd-5\",neighbor_neighbor_system_id=\"0100.0100.0101\"}[15s])) or vector(0)),\"pair\",\"xrd-1 ↔ xrd-5\",\"\",\"\")\nor\nlabel_replace((count(last_over_time(Cisco_IOS_XR_clns_isis_oper_isis_instances_instance_neighbors_neighbor_neighbor_state{source=\"xrd-2\",neighbor_neighbor_system_id=\"0100.0100.0104\"}[15s])) or vector(0)) * (count(last_over_time(Cisco_IOS_XR_clns_isis_oper_isis_instances_instance_neighbors_neighbor_neighbor_state{source=\"xrd-4\",neighbor_neighbor_system_id=\"0100.0100.0102\"}[15s])) or vector(0)),\"pair\",\"xrd-2 ↔ xrd-4\",\"\",\"\")\nor\nlabel_replace((count(last_over_time(Cisco_IOS_XR_clns_isis_oper_isis_instances_instance_neighbors_neighbor_neighbor_state{source=\"xrd-2\",neighbor_neighbor_system_id=\"0100.0100.0106\"}[15s])) or vector(0)) * (count(last_over_time(Cisco_IOS_XR_clns_isis_oper_isis_instances_instance_neighbors_neighbor_neighbor_state{source=\"xrd-6\",neighbor_neighbor_system_id=\"0100.0100.0102\"}[15s])) or vector(0)),\"pair\",\"xrd-2 ↔ xrd-6\",\"\",\"\")\nor\nlabel_replace((count(last_over_time(Cisco_IOS_XR_clns_isis_oper_isis_instances_instance_neighbors_neighbor_neighbor_state{source=\"xrd-3\",neighbor_neighbor_system_id=\"0100.0100.0104\"}[15s])) or vector(0)) * (count(last_over_time(Cisco_IOS_XR_clns_isis_oper_isis_instances_instance_neighbors_neighbor_neighbor_state{source=\"xrd-4\",neighbor_neighbor_system_id=\"0100.0100.0103\"}[15s])) or vector(0)),\"pair\",\"xrd-3 ↔ xrd-4\",\"\",\"\")\nor\nlabel_replace((count(last_over_time(Cisco_IOS_XR_clns_isis_oper_isis_instances_instance_neighbors_neighbor_neighbor_state{source=\"xrd-3\",neighbor_neighbor_system_id=\"0100.0100.0105\"}[15s])) or vector(0)) * (count(last_over_time(Cisco_IOS_XR_clns_isis_oper_isis_instances_instance_neighbors_neighbor_neighbor_state{source=\"xrd-5\",neighbor_neighbor_system_id=\"0100.0100.0103\"}[15s])) or vector(0)),\"pair\",\"xrd-3 ↔ xrd-5\",\"\",\"\")\nor\nlabel_replace((count(last_over_time(Cisco_IOS_XR_clns_isis_oper_isis_instances_instance_neighbors_neighbor_neighbor_state{source=\"xrd-3\",neighbor_neighbor_system_id=\"0100.0100.0107\"}[15s])) or vector(0)) * (count(last_over_time(Cisco_IOS_XR_clns_isis_oper_isis_instances_instance_neighbors_neighbor_neighbor_state{source=\"xrd-7\",neighbor_neighbor_system_id=\"0100.0100.0103\"}[15s])) or vector(0)),\"pair\",\"xrd-3 ↔ xrd-7\",\"\",\"\")\nor\nlabel_replace((count(last_over_time(Cisco_IOS_XR_clns_isis_oper_isis_instances_instance_neighbors_neighbor_neighbor_state{source=\"xrd-4\",neighbor_neighbor_system_id=\"0100.0100.0106\"}[15s])) or vector(0)) * (count(last_over_time(Cisco_IOS_XR_clns_isis_oper_isis_instances_instance_neighbors_neighbor_neighbor_state{source=\"xrd-6\",neighbor_neighbor_system_id=\"0100.0100.0104\"}[15s])) or vector(0)),\"pair\",\"xrd-4 ↔ xrd-6\",\"\",\"\")\nor\nlabel_replace((count(last_over_time(Cisco_IOS_XR_clns_isis_oper_isis_instances_instance_neighbors_neighbor_neighbor_state{source=\"xrd-4\",neighbor_neighbor_system_id=\"0100.0100.0107\"}[15s])) or vector(0)) * (count(last_over_time(Cisco_IOS_XR_clns_isis_oper_isis_instances_instance_neighbors_neighbor_neighbor_state{source=\"xrd-7\",neighbor_neighbor_system_id=\"0100.0100.0104\"}[15s])) or vector(0)),\"pair\",\"xrd-4 ↔ xrd-7\",\"\",\"\")\nor\nlabel_replace((count(last_over_time(Cisco_IOS_XR_clns_isis_oper_isis_instances_instance_neighbors_neighbor_neighbor_state{source=\"xrd-5\",neighbor_neighbor_system_id=\"0100.0100.0106\"}[15s])) or vector(0)) * (count(last_over_time(Cisco_IOS_XR_clns_isis_oper_isis_instances_instance_neighbors_neighbor_neighbor_state{source=\"xrd-6\",neighbor_neighbor_system_id=\"0100.0100.0105\"}[15s])) or vector(0)),\"pair\",\"xrd-5 ↔ xrd-6\",\"\",\"\")\nor\nlabel_replace((count(last_over_time(Cisco_IOS_XR_clns_isis_oper_isis_instances_instance_neighbors_neighbor_neighbor_state{source=\"xrd-5\",neighbor_neighbor_system_id=\"0100.0100.0108\"}[15s])) or vector(0)) * (count(last_over_time(Cisco_IOS_XR_clns_isis_oper_isis_instances_instance_neighbors_neighbor_neighbor_state{source=\"xrd-8\",neighbor_neighbor_system_id=\"0100.0100.0105\"}[15s])) or vector(0)),\"pair\",\"xrd-5 ↔ xrd-8\",\"\",\"\")\nor\nlabel_replace((count(last_over_time(Cisco_IOS_XR_clns_isis_oper_isis_instances_instance_neighbors_neighbor_neighbor_state{source=\"xrd-6\",neighbor_neighbor_system_id=\"0100.0100.0108\"}[15s])) or vector(0)) * (count(last_over_time(Cisco_IOS_XR_clns_isis_oper_isis_instances_instance_neighbors_neighbor_neighbor_state{source=\"xrd-8\",neighbor_neighbor_system_id=\"0100.0100.0106\"}[15s])) or vector(0)),\"pair\",\"xrd-6 ↔ xrd-8\",\"\",\"\")",
+          "instant": false,
+          "legendFormat": "{{pair}}",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "ISIS Adjacency State",
+      "type": "status-history"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 36
+      },
+      "id": 60,
+      "panels": [],
+      "title": "Logs",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 37
+      },
+      "id": 61,
+      "options": {
+        "dedupStrategy": "none",
+        "enableInfiniteScrolling": false,
+        "enableLogDetails": true,
+        "prettifyLogMessage": false,
+        "showCommonLabels": false,
+        "showControls": false,
+        "showLabels": false,
+        "showTime": true,
+        "sortOrder": "Descending",
+        "wrapLogMessage": true
+      },
+      "pluginVersion": "12.3.5",
+      "targets": [
+        {
+          "datasource": {
+            "type": "loki",
+            "uid": "loki"
+          },
+          "expr": "{job=\"xrd-syslog\", hostname=~\"$device\"} |~ `%[A-Z0-9_]+-[A-Z0-9_]+-[0-5]-` !~ `MGBL-MDT-5-STREAM_AT_GATHERPOINT`",
+          "legendFormat": "",
+          "refId": "A"
+        }
+      ],
+      "title": "XRd Syslog — Notice and above (severity ≤ 5)",
+      "type": "logs"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 45
+      },
+      "id": 10,
+      "panels": [],
+      "title": "Interfaces",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "bps"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 12,
+        "x": 0,
+        "y": 46
+      },
+      "id": 12,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.3.5",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "rate(openconfig_interfaces_interface_state_counters_out_octets{source=~\"$device\", interface_name!~\"Loopback.*|MgmtEth.*|Null.*|srte_.*\"}[1m]) * 8",
+          "legendFormat": "{{source}} {{interface_name}}",
+          "refId": "A"
+        }
+      ],
+      "title": "TX Rate (bps)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "bps"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 12,
+        "x": 12,
+        "y": 46
+      },
+      "id": 13,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.3.5",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "rate(openconfig_interfaces_interface_state_counters_in_octets{source=~\"$device\", interface_name!~\"Loopback.*|MgmtEth.*|Null.*|srte_.*\"}[1m]) * 8",
+          "legendFormat": "{{source}} {{interface_name}}",
+          "refId": "A"
+        }
+      ],
+      "title": "RX Rate (bps)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "pps"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 12,
+        "x": 0,
+        "y": 52
+      },
+      "id": 105,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.3.5",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "rate(openconfig_interfaces_interface_state_counters_in_errors{source=~\"$device\", interface_name!~\"Loopback.*|MgmtEth.*|Null.*|srte_.*\"}[5m])",
+          "legendFormat": "{{source}} {{interface_name}} RX errors",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "rate(openconfig_interfaces_interface_state_counters_out_errors{source=~\"$device\", interface_name!~\"Loopback.*|MgmtEth.*|Null.*|srte_.*\"}[5m])",
+          "legendFormat": "{{source}} {{interface_name}} TX errors",
+          "refId": "B"
+        }
+      ],
+      "title": "Interface Errors",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "description": "Number of up/down transitions in the selected time window. Useful for detecting unstable interfaces.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 12,
+        "x": 12,
+        "y": 52
+      },
+      "id": 106,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.3.5",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "changes(openconfig_interfaces_interface_state_oper_status{source=~\"$device\", interface_name!~\"Loopback.*|MgmtEth.*|Null.*|srte_.*\"}[$__range])",
+          "legendFormat": "{{source}} {{interface_name}}",
+          "refId": "A"
+        }
+      ],
+      "title": "Interface State Changes (flaps)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "description": "Matrix view: rows=devices, columns=Loopback interfaces. Green=UP, Red=DOWN.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "center",
+            "cellOptions": {
+              "mode": "basic",
+              "type": "color-background"
+            },
+            "filterable": false,
+            "footer": {
+              "reducers": []
+            },
+            "inspect": false,
+            "minWidth": 40,
+            "width": 50,
+            "wrapText": false
+          },
+          "displayName": "${__field.name}",
+          "mappings": [
+            {
+              "options": {
+                "0": {
+                  "color": "dark-red",
+                  "index": 0,
+                  "text": "DOWN"
+                },
+                "1": {
+                  "color": "dark-green",
+                  "index": 1,
+                  "text": "UP"
+                }
+              },
+              "type": "value"
+            },
+            {
+              "options": {
+                "match": "null+nan",
+                "result": {
+                  "color": "dark-gray",
+                  "index": 2,
+                  "text": "N/A"
+                }
+              },
+              "type": "special"
+            }
+          ],
+          "noValue": "",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "dark-gray",
+                "value": 0
+              },
+              {
+                "color": "dark-red",
+                "value": 0
+              },
+              {
+                "color": "dark-green",
+                "value": 1
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "source\\\\.*"
+            },
+            "properties": [
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "auto"
+                }
+              },
+              {
+                "id": "custom.width",
+                "value": 70
+              },
+              {
+                "id": "custom.align",
+                "value": "left"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 5,
+        "x": 0,
+        "y": 58
+      },
+      "id": 301,
+      "options": {
+        "cellHeight": "sm",
+        "showHeader": true
+      },
+      "pluginVersion": "12.3.5",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "expr": "openconfig_interfaces_interface_state_oper_status{source=~\"$device\", name=~\"Loopback.*\"}",
+          "format": "table",
+          "instant": true,
+          "legendFormat": "__auto",
+          "range": false,
+          "refId": "A"
+        }
+      ],
+      "title": "Loopback State Matrix",
+      "transformations": [
+        {
+          "id": "groupingToMatrix",
+          "options": {
+            "columnField": "name",
+            "emptyValue": "null",
+            "rowField": "source",
+            "valueField": "Value"
+          }
+        },
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "Loopback(.*)",
+            "renamePattern": "Lo$1"
+          }
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "fields": {},
+            "sort": [
+              {
+                "desc": false,
+                "field": "source\\name"
+              }
+            ]
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {},
+            "indexByName": {
+              "source\\name": 0,
+              "Lo0": 1,
+              "Lo100": 2,
+              "Lo900": 3
+            },
+            "renameByName": {}
+          }
+        }
+      ],
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "description": "Up/down state of all Loopback interfaces. A loopback going down can cascade to ISIS, BGP, and other protocol failures.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "axisPlacement": "auto",
+            "fillOpacity": 70,
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineWidth": 1,
+            "spanNulls": false
+          },
+          "mappings": [
+            {
+              "options": {
+                "0": {
+                  "color": "red",
+                  "index": 0,
+                  "text": "DOWN"
+                },
+                "1": {
+                  "color": "green",
+                  "index": 1,
+                  "text": "UP"
+                }
+              },
+              "type": "value"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": 0
+              },
+              {
+                "color": "green",
+                "value": 1
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 19,
+        "x": 5,
+        "y": 58
+      },
+      "id": 201,
+      "options": {
+        "colWidth": 0.9,
+        "legend": {
+          "displayMode": "hidden",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "rowHeight": 0.9,
+        "showValue": "never",
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.3.5",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "openconfig_interfaces_interface_state_oper_status{source=~\"$device\", interface_name=~\"Loopback.*\"}",
+          "legendFormat": "{{source}} {{interface_name}}",
+          "refId": "A"
+        }
+      ],
+      "title": "Loopback State",
+      "type": "status-history"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 68
+      },
+      "id": 20,
+      "panels": [],
+      "title": "ISIS",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "axisSoftMin": 0,
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 20,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 24,
+        "x": 0,
+        "y": 69
+      },
+      "id": 104,
+      "options": {
+        "legend": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.5",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "count by (source) (Cisco_IOS_XR_clns_isis_oper_isis_instances_instance_neighbors_neighbor_neighbor_state{source=~\"$device\"} == 1)",
+          "legendFormat": "{{source}}",
+          "refId": "A"
+        }
+      ],
+      "title": "ISIS Adjacencies UP — per device",
+      "type": "timeseries"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 78
+      },
+      "id": 30,
+      "panels": [],
+      "title": "BGP",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "description": "Matrix view: rows=source device, columns=BGP peer IP address. Green=ESTABLISHED, Red=not established. Pattern reveals hub-and-spoke topology (most devices peer only to vRR xrd-8).",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "center",
+            "cellOptions": {
+              "mode": "basic",
+              "type": "color-background"
+            },
+            "footer": {
+              "reducers": []
+            },
+            "inspect": false,
+            "minWidth": 40,
+            "width": 55,
+            "wrapText": false
+          },
+          "displayName": "${__field.name}",
+          "mappings": [
+            {
+              "options": {
+                "0": {
+                  "color": "dark-red",
+                  "index": 0,
+                  "text": "NOT ESTAB"
+                },
+                "1": {
+                  "color": "dark-green",
+                  "index": 1,
+                  "text": "ESTAB"
+                }
+              },
+              "type": "value"
+            },
+            {
+              "options": {
+                "match": "null+nan",
+                "result": {
+                  "color": "dark-gray",
+                  "index": 2,
+                  "text": "N/A"
+                }
+              },
+              "type": "special"
+            }
+          ],
+          "noValue": "",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "dark-gray",
+                "value": 0
+              },
+              {
+                "color": "dark-red",
+                "value": 0
+              },
+              {
+                "color": "dark-green",
+                "value": 1
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "source\\\\.*"
+            },
+            "properties": [
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "auto"
+                }
+              },
+              {
+                "id": "custom.width",
+                "value": 70
+              },
+              {
+                "id": "custom.align",
+                "value": "left"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 7,
+        "x": 0,
+        "y": 79
+      },
+      "id": 303,
+      "options": {
+        "cellHeight": "sm",
+        "showHeader": true
+      },
+      "pluginVersion": "12.3.5",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "expr": "max by (source, neighbor_neighbor_address) (  Cisco_IOS_XR_ipv4_bgp_oper_bgp_instances_instance_instance_active_default_vrf_neighbors_neighbor_connection_state{source=~\"$device\"})",
+          "format": "table",
+          "instant": true,
+          "legendFormat": "__auto",
+          "range": false,
+          "refId": "A"
+        }
+      ],
+      "title": "BGP Sessions (iBGP Hub-and-Spoke)",
+      "transformations": [
+        {
+          "id": "groupingToMatrix",
+          "options": {
+            "columnField": "neighbor_neighbor_address",
+            "emptyValue": "null",
+            "rowField": "source",
+            "valueField": "Value"
+          }
+        },
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "100\\.100\\.100\\.(.*)",
+            "renamePattern": "$1"
+          }
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "fields": {},
+            "sort": [
+              {
+                "desc": false,
+                "field": "source\\neighbor_neighbor_address"
+              }
+            ]
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {},
+            "indexByName": {
+              "source\\neighbor_neighbor_address": 0,
+              "1": 1,
+              "2": 2,
+              "3": 3,
+              "4": 4,
+              "5": 5,
+              "6": 6,
+              "7": 7,
+              "8": 8
+            },
+            "renameByName": {}
+          }
+        }
+      ],
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "axisPlacement": "auto",
+            "fillOpacity": 70,
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineWidth": 1,
+            "spanNulls": false
+          },
+          "mappings": [
+            {
+              "options": {
+                "0": {
+                  "color": "red",
+                  "index": 1,
+                  "text": "NOT ESTABLISHED"
+                },
+                "1": {
+                  "color": "green",
+                  "index": 0,
+                  "text": "ESTABLISHED"
+                }
+              },
+              "type": "value"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": 0
+              },
+              {
+                "color": "green",
+                "value": 1
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 17,
+        "x": 7,
+        "y": 79
+      },
+      "id": 31,
+      "options": {
+        "colWidth": 0.9,
+        "legend": {
+          "displayMode": "hidden",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "rowHeight": 0.9,
+        "showValue": "never",
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.3.5",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "max by (source, neighbor_neighbor_address) (Cisco_IOS_XR_ipv4_bgp_oper_bgp_instances_instance_instance_active_default_vrf_neighbors_neighbor_connection_state{source=~\"$device\"})",
+          "legendFormat": "{{source}} → {{neighbor_neighbor_address}}",
+          "refId": "A"
+        }
+      ],
+      "title": "BGP Session State",
+      "type": "status-history"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 87
+      },
+      "id": 32,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.3.5",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "max by (source, neighbor_neighbor_address) (Cisco_IOS_XR_ipv4_bgp_oper_bgp_instances_instance_instance_active_default_vrf_neighbors_neighbor_connection_down_count{source=~\"$device\"})",
+          "legendFormat": "{{source}} → {{neighbor_neighbor_address}}",
+          "refId": "A"
+        }
+      ],
+      "title": "BGP Connection Down Count",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 87
+      },
+      "id": 107,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.3.5",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "rate(Cisco_IOS_XR_ipv4_bgp_oper_bgp_instances_instance_instance_active_default_vrf_neighbors_neighbor_message_statistics_update_rx_count{source=~\"$device\"}[5m])",
+          "legendFormat": "{{source}} → {{neighbor_neighbor_address}}",
+          "refId": "A"
+        }
+      ],
+      "title": "BGP Update Messages Received",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 95
+      },
+      "id": 108,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.3.5",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "max by (source, neighbor_neighbor_address) (Cisco_IOS_XR_ipv4_bgp_oper_bgp_instances_instance_instance_active_default_vrf_neighbors_neighbor_af_data_0_prefixes_accepted{source=~\"$device\"})",
+          "legendFormat": "{{source}} → {{neighbor_neighbor_address}}",
+          "refId": "A"
+        }
+      ],
+      "title": "BGP Prefixes Received per Neighbour",
+      "type": "timeseries"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 103
+      },
+      "id": 40,
+      "panels": [],
+      "title": "Segment Routing",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 104
+      },
+      "id": 41,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.3.5",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "Cisco_IOS_XR_mpls_lsd_oper_mpls_lsd_label_summary_total_labels{source=~\"$device\"}",
+          "legendFormat": "{{source}} total",
+          "refId": "A"
+        }
+      ],
+      "title": "MPLS Labels Allocated",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 104
+      },
+      "id": 42,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.3.5",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "count by (source) (Cisco_IOS_XR_infra_xtc_oper_pce_topology_nodes_topology_node_ipv4_link_0_local_igp_information_node_id_igp_isis_system_id{source=\"xrd-7\"})",
+          "legendFormat": "{{source}} topology nodes",
+          "refId": "A"
+        }
+      ],
+      "title": "PCE Topology Links (xrd-7)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "description": "Transmit throughput per SR-TE tunnel. A flat line at 0 means the tunnel is dark (no traffic forwarded).",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "bps"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 112
+      },
+      "id": 202,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.3.5",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "rate(openconfig_interfaces_interface_state_counters_out_octets{source=~\"$device\", interface_name=~\"srte_.*\"}[1m]) * 8",
+          "legendFormat": "{{source}} {{interface_name}}",
+          "refId": "A"
+        }
+      ],
+      "title": "SR-TE Tunnel TX Rate (bps)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "description": "Receive throughput per SR-TE tunnel.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "bps"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 112
+      },
+      "id": 203,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.3.5",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "rate(openconfig_interfaces_interface_state_counters_in_octets{source=~\"$device\", interface_name=~\"srte_.*\"}[1m]) * 8",
+          "legendFormat": "{{source}} {{interface_name}}",
+          "refId": "A"
+        }
+      ],
+      "title": "SR-TE Tunnel RX Rate (bps)",
+      "type": "timeseries"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 120
+      },
+      "id": 50,
+      "panels": [],
+      "title": "System Health",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "max": 1,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "percentunit"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 121
+      },
+      "id": 51,
+      "options": {
+        "legend": {
+          "calcs": [
+            "last"
+          ],
+          "displayMode": "table",
+          "placement": "right",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.3.5",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "1 - (Cisco_IOS_XR_nto_misc_oper_memory_summary_nodes_node_summary_free_physical_memory{source=~\"$device\"} / Cisco_IOS_XR_nto_misc_oper_memory_summary_nodes_node_summary_ram_memory{source=~\"$device\"})",
+          "legendFormat": "{{source}}",
+          "refId": "A"
+        }
+      ],
+      "title": "Memory Usage %",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "bytes"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 121
+      },
+      "id": 52,
+      "options": {
+        "legend": {
+          "calcs": [
+            "last"
+          ],
+          "displayMode": "table",
+          "placement": "right",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.3.5",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "Cisco_IOS_XR_nto_misc_oper_memory_summary_nodes_node_summary_free_physical_memory{source=~\"$device\"}",
+          "legendFormat": "{{source}}",
+          "refId": "A"
+        }
+      ],
+      "title": "Free Physical Memory",
+      "type": "timeseries"
+    }
+  ],
+  "preload": false,
+  "refresh": "10s",
+  "schemaVersion": 42,
+  "tags": [
+    "xrd",
+    "segment-routing",
+    "cisco-live",
+    "alert-scenario"
+  ],
+  "templating": {
+    "list": [
+      {
+        "allValue": ".*",
+        "current": {
+          "text": "All",
+          "value": "$__all"
+        },
+        "datasource": {
+          "type": "prometheus",
+          "uid": "prometheus"
+        },
+        "definition": "label_values(openconfig_interfaces_interface_state_oper_status, source)",
+        "includeAll": true,
+        "label": "Device",
+        "name": "device",
+        "options": [],
+        "query": {
+          "query": "label_values(openconfig_interfaces_interface_state_oper_status, source)",
+          "refId": "StandardVariableQuery"
+        },
+        "refresh": 2,
+        "regex": "",
+        "sort": 1,
+        "type": "query"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-30m",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "XRd SR Topology Overview",
+  "uid": "xrd-sr-overview",
+  "version": 4
+}

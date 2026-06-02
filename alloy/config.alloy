@@ -1,0 +1,65 @@
+// Grafana Alloy configuration for XRd syslog ingestion
+// XRd configured with: logging format rfc5424
+//                      logging hostnameprefix xrd-N  (per device)
+
+loki.write "default" {
+  endpoint {
+    url = "http://loki:3100/loki/api/v1/push"
+  }
+}
+
+// Promote internal syslog labels to proper Loki labels so the dashboard can filter by
+// device. All __ prefixed labels are dropped before forwarding unless explicitly remapped.
+loki.relabel "syslog_labels" {
+  rule {
+    source_labels = ["__syslog_message_hostname"]
+    target_label  = "hostname"
+  }
+  forward_to = []
+}
+
+// Extract the IOS-XR severity digit from the mnemonic embedded in the log line.
+// IOS-XR format: %FACILITY-SUBFACILITY-<N>-MNEMONIC  (N = 0..7, RFC5424 severity)
+// This populates the "severity" stream label with a numeric value so queries can
+// filter with  severity=~"[0-5]"  (emergency through notice).
+loki.process "xr_severity_extract" {
+  stage.regex {
+    expression = `%[A-Z0-9_]+-[A-Z0-9_]+-(?P<xr_severity>[0-7])-[A-Z0-9_]+`
+  }
+  stage.labels {
+    values = {
+      severity = "xr_severity",
+    }
+  }
+  forward_to = [loki.write.default.receiver]
+}
+
+loki.source.syslog "xrd_syslog" {
+  relabel_rules = loki.relabel.syslog_labels.rules
+
+  listener {
+    address                = "0.0.0.0:5514"
+    protocol               = "udp"
+    syslog_format          = "rfc5424"
+    use_rfc5424_message    = true
+    use_incoming_timestamp = true
+    label_structured_data  = true
+    labels = {
+      job    = "xrd-syslog",
+      source = "xrd",
+    }
+  }
+  listener {
+    address                = "0.0.0.0:5514"
+    protocol               = "tcp"
+    syslog_format          = "rfc5424"
+    use_rfc5424_message    = true
+    use_incoming_timestamp = true
+    label_structured_data  = true
+    labels = {
+      job    = "xrd-syslog",
+      source = "xrd",
+    }
+  }
+  forward_to = [loki.process.xr_severity_extract.receiver]
+}

@@ -1,0 +1,148 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 620" width="820" height="620">
+  <defs>
+    <style>
+      .node-box { fill: #1a1a2e; stroke: #4a4a6a; stroke-width: 2; rx: 8; ry: 8; }
+      .node-label { fill: #ffffff; font-family: 'Segoe UI', sans-serif; font-size: 22px; font-weight: bold; text-anchor: middle; dominant-baseline: central; }
+      .node-role { fill: #aaaacc; font-family: 'Segoe UI', sans-serif; font-size: 13px; text-anchor: middle; dominant-baseline: central; }
+      .link { stroke-width: 3.5; fill: none; }
+      .port-label { fill: #88ddff; font-family: 'Segoe UI', sans-serif; font-size: 18px; font-weight: bold; text-anchor: middle; dominant-baseline: central; }
+    </style>
+  </defs>
+
+  <!-- Background -->
+  <rect width="820" height="620" fill="#181B1F"/>
+
+  <!-- ═══════════════════ LINKS ═══════════════════ -->
+
+  <!-- xrd-1:Gi0/0/0/0 ↔ xrd-3:Gi0/0/0/2 -->
+  <line id="link_xrd1_gi0_xrd3_gi2" class="link" x1="200" y1="300" x2="290" y2="190" stroke="#4BDD33"/>
+  <!-- xrd-1:Gi0/0/0/1 ↔ xrd-5:Gi0/0/0/2 -->
+  <line id="link_xrd1_gi1_xrd5_gi2" class="link" x1="200" y1="330" x2="290" y2="430" stroke="#4BDD33"/>
+
+  <!-- xrd-2:Gi0/0/0/0 ↔ xrd-4:Gi0/0/0/2 -->
+  <line id="link_xrd2_gi0_xrd4_gi2" class="link" x1="620" y1="300" x2="530" y2="190" stroke="#4BDD33"/>
+  <!-- xrd-2:Gi0/0/0/1 ↔ xrd-6:Gi0/0/0/2 -->
+  <line id="link_xrd2_gi1_xrd6_gi2" class="link" x1="620" y1="330" x2="530" y2="430" stroke="#4BDD33"/>
+
+  <!-- xrd-3:Gi0/0/0/0 ↔ xrd-4:Gi0/0/0/0 -->
+  <line id="link_xrd3_gi0_xrd4_gi0" class="link" x1="335" y1="170" x2="485" y2="170" stroke="#4BDD33"/>
+  <!-- xrd-3:Gi0/0/0/1 ↔ xrd-5:Gi0/0/0/1 -->
+  <line id="link_xrd3_gi1_xrd5_gi1" class="link" x1="290" y1="210" x2="290" y2="410" stroke="#4BDD33"/>
+  <!-- xrd-3:Gi0/0/0/3 ↔ xrd-7:Gi0/0/0/0 -->
+  <line id="link_xrd3_gi3_xrd7_gi0" class="link" x1="320" y1="150" x2="380" y2="90" stroke="#4BDD33"/>
+
+  <!-- xrd-4:Gi0/0/0/1 ↔ xrd-6:Gi0/0/0/1 -->
+  <line id="link_xrd4_gi1_xrd6_gi1" class="link" x1="530" y1="210" x2="530" y2="410" stroke="#4BDD33"/>
+  <!-- xrd-4:Gi0/0/0/3 ↔ xrd-7:Gi0/0/0/1 -->
+  <line id="link_xrd4_gi3_xrd7_gi1" class="link" x1="500" y1="150" x2="440" y2="90" stroke="#4BDD33"/>
+
+  <!-- xrd-5:Gi0/0/0/0 ↔ xrd-6:Gi0/0/0/0 -->
+  <line id="link_xrd5_gi0_xrd6_gi0" class="link" x1="335" y1="450" x2="485" y2="450" stroke="#4BDD33"/>
+  <!-- xrd-5:Gi0/0/0/3 ↔ xrd-8:Gi0/0/0/0 -->
+  <line id="link_xrd5_gi3_xrd8_gi0" class="link" x1="320" y1="470" x2="380" y2="540" stroke="#4BDD33"/>
+
+  <!-- xrd-6:Gi0/0/0/3 ↔ xrd-8:Gi0/0/0/1 -->
+  <line id="link_xrd6_gi3_xrd8_gi1" class="link" x1="500" y1="470" x2="440" y2="540" stroke="#4BDD33"/>
+
+  <!-- ═══════════════════ PORT LABELS PER LINK ═══════════════════ -->
+  <!--
+    Square links (xrd-3/4/5/6): labels sit INSIDE the square, toward center (410,310).
+    Outer diagonal links (xrd-1/xrd-2): labels sit OUTSIDE the square, away from center.
+    Each link has two labels, one near each endpoint.
+  -->
+
+  <!-- xrd-3:G0 ↔ xrd-4:G0  (top of square — labels below the line, inside) -->
+  <text class="port-label" x="362" y="185">G0</text>
+  <text class="port-label" x="458" y="185">G0</text>
+
+  <!-- xrd-3:G1 ↔ xrd-5:G1  (left side of square — labels right of line, inside) -->
+  <text class="port-label" x="310" y="238">G1</text>
+  <text class="port-label" x="310" y="382">G1</text>
+
+  <!-- xrd-4:G1 ↔ xrd-6:G1  (right side of square — labels left of line, inside) -->
+  <text class="port-label" x="510" y="238">G1</text>
+  <text class="port-label" x="510" y="382">G1</text>
+
+  <!-- xrd-5:G0 ↔ xrd-6:G0  (bottom of square — labels above the line, inside) -->
+  <text class="port-label" x="362" y="438">G0</text>
+  <text class="port-label" x="458" y="438">G0</text>
+
+  <!-- xrd-1:G0 ↔ xrd-3:G2  (upper-left diagonal — labels outside, away from square) -->
+  <text class="port-label" x="198" y="272">G0</text>
+  <text class="port-label" x="258" y="210">G2</text>
+
+  <!-- xrd-1:G1 ↔ xrd-5:G2  (lower-left diagonal — labels outside, away from square) -->
+  <text class="port-label" x="188" y="348">G1</text>
+  <text class="port-label" x="258" y="415">G2</text>
+
+  <!-- xrd-2:G0 ↔ xrd-4:G2  (upper-right diagonal — labels outside, away from square) -->
+  <text class="port-label" x="622" y="272">G0</text>
+  <text class="port-label" x="562" y="210">G2</text>
+
+  <!-- xrd-2:G1 ↔ xrd-6:G2  (lower-right diagonal — labels outside, away from square) -->
+  <text class="port-label" x="632" y="348">G1</text>
+  <text class="port-label" x="562" y="415">G2</text>
+
+  <!-- xrd-3:G3 ↔ xrd-7:G0 -->
+  <text class="port-label" x="302" y="143">G3</text>
+  <text class="port-label" x="370" y="108">G0</text>
+
+  <!-- xrd-4:G3 ↔ xrd-7:G1 -->
+  <text class="port-label" x="518" y="143">G3</text>
+  <text class="port-label" x="450" y="108">G1</text>
+
+  <!-- xrd-5:G3 ↔ xrd-8:G0 -->
+  <text class="port-label" x="302" y="477">G3</text>
+  <text class="port-label" x="370" y="523">G0</text>
+
+  <!-- xrd-6:G3 ↔ xrd-8:G1 -->
+  <text class="port-label" x="518" y="477">G3</text>
+  <text class="port-label" x="450" y="523">G1</text>
+
+  <!-- ═══════════════════ NODES ═══════════════════ -->
+
+  <!-- xrd-7 (PCE) - top center -->
+  <rect id="node_xrd7" class="node-box" x="365" y="42" width="90" height="50"/>
+  <text class="node-label" x="410" y="60">xrd-7</text>
+  <text class="node-role" x="410" y="80">PCE</text>
+
+  <!-- xrd-3 - upper left -->
+  <rect id="node_xrd3" class="node-box" x="245" y="150" width="90" height="50"/>
+  <text class="node-label" x="290" y="178">xrd-3</text>
+
+  <!-- xrd-4 - upper right -->
+  <rect id="node_xrd4" class="node-box" x="485" y="150" width="90" height="50"/>
+  <text class="node-label" x="530" y="178">xrd-4</text>
+
+  <!-- xrd-1 - middle left (src) -->
+  <rect id="node_xrd1" class="node-box" x="145" y="285" width="90" height="50"/>
+  <text class="node-label" x="190" y="305">xrd-1</text>
+  <text class="node-role" x="190" y="325">src</text>
+
+  <!-- xrd-2 - middle right (dst) -->
+  <rect id="node_xrd2" class="node-box" x="585" y="285" width="90" height="50"/>
+  <text class="node-label" x="630" y="305">xrd-2</text>
+  <text class="node-role" x="630" y="325">dst</text>
+
+  <!-- xrd-5 - lower left -->
+  <rect id="node_xrd5" class="node-box" x="245" y="420" width="90" height="50"/>
+  <text class="node-label" x="290" y="448">xrd-5</text>
+
+  <!-- xrd-6 - lower right -->
+  <rect id="node_xrd6" class="node-box" x="485" y="420" width="90" height="50"/>
+  <text class="node-label" x="530" y="448">xrd-6</text>
+
+  <!-- xrd-8 (vRR) - bottom center -->
+  <rect id="node_xrd8" class="node-box" x="365" y="535" width="90" height="50"/>
+  <text class="node-label" x="410" y="553">xrd-8</text>
+  <text class="node-role" x="410" y="573">vRR</text>
+
+  <!-- ═══════════════════ LEGEND ═══════════════════ -->
+  <rect x="18" y="18" width="140" height="90" fill="#1a1a2e" stroke="#4a4a6a" rx="4"/>
+  <circle cx="38" cy="40" r="8" fill="#4BDD33"/>
+  <text x="55" y="44" fill="#ccc" font-size="20" font-family="sans-serif">Link UP</text>
+  <circle cx="38" cy="64" r="8" fill="#FF3154"/>
+  <text x="55" y="68" fill="#ccc" font-size="20" font-family="sans-serif">Link DOWN</text>
+  <circle cx="38" cy="88" r="8" fill="#808080"/>
+  <text x="55" y="92" fill="#ccc" font-size="20" font-family="sans-serif">No data</text>
+</svg>

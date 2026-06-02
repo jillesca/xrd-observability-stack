@@ -1,165 +1,219 @@
 ---
-username: admin
 log: true
 
-loader:
-  type: docker
-  filters:
-    - containers:
-        - label=clab-node-kind: nokia_srlinux
-      config:
-        skip-verify: true
-        insecure: false
-        password: NokiaSrl1!
-        subscriptions:
-          - srl-if-states
-          - srl-if-stats
-          - srl-bgp
-          - srl-system-performance
-          - srl-routes
-          - srl-bridge
-          - srl-apps
-          - srl-net-instance
-    - containers:
-        - label=clab-node-kind: arista_ceos
-      port: "6030"
-      config:
-        skip-verify: false
-        insecure: true
-        password: admin
-        subscriptions:
-          - eos-if-states
-          - eos-if-stats
+username: cisco
+password: C1sco12345
+insecure: true
+port: 57777
+encoding: json_ietf
+
+targets:
+  10.10.20.101:
+    name: xrd-1
+    subscriptions:
+      - xrd-if-states
+      - xrd-if-stats
+      - xrd-isis-adjacency
+      - xrd-isis-stats
+      - xrd-bgp-sessions
+      - xrd-bgp-stats
+      - xrd-mpls-labels
+      - xrd-system-health
+  10.10.20.102:
+    name: xrd-2
+    subscriptions:
+      - xrd-if-states
+      - xrd-if-stats
+      - xrd-isis-adjacency
+      - xrd-isis-stats
+      - xrd-bgp-sessions
+      - xrd-bgp-stats
+      - xrd-mpls-labels
+      - xrd-system-health
+  10.10.20.103:
+    name: xrd-3
+    subscriptions:
+      - xrd-if-states
+      - xrd-if-stats
+      - xrd-isis-adjacency
+      - xrd-isis-stats
+      - xrd-bgp-sessions
+      - xrd-bgp-stats
+      - xrd-mpls-labels
+      - xrd-system-health
+  10.10.20.104:
+    name: xrd-4
+    subscriptions:
+      - xrd-if-states
+      - xrd-if-stats
+      - xrd-isis-adjacency
+      - xrd-isis-stats
+      - xrd-bgp-sessions
+      - xrd-bgp-stats
+      - xrd-mpls-labels
+      - xrd-system-health
+  10.10.20.105:
+    name: xrd-5
+    subscriptions:
+      - xrd-if-states
+      - xrd-if-stats
+      - xrd-isis-adjacency
+      - xrd-isis-stats
+      - xrd-bgp-sessions
+      - xrd-bgp-stats
+      - xrd-mpls-labels
+      - xrd-system-health
+  10.10.20.106:
+    name: xrd-6
+    subscriptions:
+      - xrd-if-states
+      - xrd-if-stats
+      - xrd-isis-adjacency
+      - xrd-isis-stats
+      - xrd-bgp-sessions
+      - xrd-bgp-stats
+      - xrd-mpls-labels
+      - xrd-system-health
+  10.10.20.107:
+    name: xrd-7
+    subscriptions:
+      - xrd-if-states
+      - xrd-if-stats
+      - xrd-isis-adjacency
+      - xrd-isis-stats
+      - xrd-bgp-sessions
+      - xrd-bgp-stats
+      - xrd-mpls-labels
+      - xrd-system-health
+      - xrd-pce-topology
+  10.10.20.108:
+    name: xrd-8
+    subscriptions:
+      - xrd-if-states
+      - xrd-if-stats
+      - xrd-isis-adjacency
+      - xrd-isis-stats
+      - xrd-bgp-sessions
+      - xrd-bgp-stats
+      - xrd-mpls-labels
+      - xrd-system-health
 
 subscriptions:
-  # srl
-  srl-system-performance:
-    mode: stream
-    stream-mode: sample
-    sample-interval: 5s
-    paths:
-      - /platform/control[slot=*]/cpu[index=all]/total
-      - /platform/control[slot=*]/memory
-    outputs:
-      - nats-srl-out
-  srl-if-states:
-    mode: stream
-    stream-mode: on_change
-    heartbeat-interval: 5s
-    paths:
-      - /interface[name=ethernet-1/*]/oper-state
-    outputs:
-      - nats-srl-out
-  srl-if-stats:
-    mode: stream
-    stream-mode: sample
-    sample-interval: 5s
-    paths:
-      - /interface[name=ethernet-1/*]/statistics
-      - /interface[name=ethernet-1/*]/traffic-rate
-    outputs:
-      - nats-srl-out
-  srl-routes:
-    mode: stream
-    stream-mode: sample
-    sample-interval: 5s
-    paths:
-      - /network-instance[name=*]/route-table/ipv4-unicast/statistics/
-      - /network-instance[name=*]/route-table/ipv6-unicast/statistics/
-    outputs:
-      - nats-srl-out
-  srl-bgp:
-    mode: stream
-    stream-mode: sample
-    sample-interval: 5s
-    paths:
-      - /network-instance[name=*]/protocols/bgp/statistics
-    outputs:
-      - nats-srl-out
-  srl-bridge:
-    mode: stream
-    stream-mode: sample
-    sample-interval: 5s
-    paths:
-      - /network-instance[name=*]/bridge-table/statistics/
-    outputs:
-      - nats-srl-out
-  srl-apps:
-    mode: stream
-    stream-mode: sample
-    sample-interval: 5s
-    paths:
-      - /system/app-management/application[name=*]
-    outputs:
-      - nats-srl-out
-  srl-net-instance:
-    mode: stream
-    stream-mode: on_change
-    heartbeat-interval: 5s
-    paths:
-      - /network-instance[name=*]/oper-state
-    outputs:
-      - nats-srl-out
+  # ── XRd / IOS-XR 25.3.1 ─────────────────────────────────────────────────
 
-  # eos
-  eos-if-stats:
+  # Interface operational state (on_change for immediate alert triggering)
+  xrd-if-states:
+    mode: stream
+    stream-mode: on_change
+    heartbeat-interval: 60s
+    paths:
+      - /interfaces/interface[name=*]/state/oper-status
+      - /interfaces/interface[name=*]/state/admin-status
+    outputs:
+      - nats-xrd-out
+
+  # Interface traffic statistics (sampled)
+  xrd-if-stats:
     mode: stream
     stream-mode: sample
-    sample-interval: 5s
+    sample-interval: 30s
     paths:
       - /interfaces/interface[name=*]/state/counters
     outputs:
-      - nats-eos-out
+      - nats-xrd-out
 
-  eos-if-states:
+  # ISIS adjacency state (on_change for immediate alert triggering)
+  # XR native YANG — OC adjacency sub-paths are not navigable via gNMI on XRd 25.3.1
+  # neighbor-state values: isis-adj-up-state (1) / isis-adj-down-state (0)
+  # heartbeat-interval: 10s (reduced from 60s) so last_over_time[15s] in the
+  # ISIS Adjacency State panel detects absence within ~15s instead of ~70s.
+  xrd-isis-adjacency:
     mode: stream
     stream-mode: on_change
-    # heartbeat-interval: 60s
-      #stream-mode: sample
-      #sample-interval: 5s
+    heartbeat-interval: 10s
     paths:
-      - /interfaces/interface[name=*]/state/admin-status
-      - /interfaces/interface[name=*]/state/oper-status
-      - /interfaces/interface[name=*]/state/last-change
-      - /interfaces/interface[name=*]/state/mtu
+      - Cisco-IOS-XR-clns-isis-oper:isis/instances/instance[instance-name=*]/neighbors/neighbor
     outputs:
-      - nats-eos-out
+      - nats-xrd-out
+
+  # ISIS convergence data — XR native YANG
+  # OC global/counters sub-path not navigable via gNMI on XRd 25.3.1
+  xrd-isis-stats:
+    mode: stream
+    stream-mode: sample
+    sample-interval: 30s
+    paths:
+      - Cisco-IOS-XR-clns-isis-oper:isis/instances/instance[instance-name=*]/topologies/topology[af-name=ipv4][saf-name=unicast]/frr-summary
+    outputs:
+      - nats-xrd-out
+
+  # BGP session state (on_change)
+  # XR native YANG — OC BGP neighbor state sub-paths not navigable via gNMI on XRd 25.3.1
+  # connection-state values: bgp-st-estab (1) / bgp-st-idle, bgp-st-connect, bgp-st-active (0)
+  xrd-bgp-sessions:
+    mode: stream
+    stream-mode: on_change
+    heartbeat-interval: 60s
+    paths:
+      - Cisco-IOS-XR-ipv4-bgp-oper:bgp/instances/instance[instance-name=default]/instance-active/default-vrf/neighbors/neighbor[neighbor-address=*]/connection-state
+    outputs:
+      - nats-xrd-out
+
+  # BGP message counters (sampled) — XR native YANG
+  xrd-bgp-stats:
+    mode: stream
+    stream-mode: sample
+    sample-interval: 30s
+    paths:
+      - Cisco-IOS-XR-ipv4-bgp-oper:bgp/instances/instance[instance-name=default]/instance-active/default-vrf/neighbors/neighbor[neighbor-address=*]/message-statistics
+    outputs:
+      - nats-xrd-out
+
+  # MPLS label usage — XR native YANG (richer than OpenConfig for SR)
+  # [to validate] — remove path if unsupported on this XRd version
+  xrd-mpls-labels:
+    mode: stream
+    stream-mode: sample
+    sample-interval: 30s
+    paths:
+      - Cisco-IOS-XR-mpls-lsd-oper:mpls-lsd/label-summary
+    outputs:
+      - nats-xrd-out
+
+  # System health — XR native YANG
+  # CPU: Cisco-IOS-XR-wdsysmon-fd-oper not installed on XRd 25.3.1 — omitted
+  xrd-system-health:
+    mode: stream
+    stream-mode: sample
+    sample-interval: 30s
+    paths:
+      - Cisco-IOS-XR-nto-misc-oper:memory-summary/nodes/node[node-name=*]/summary
+    outputs:
+      - nats-xrd-out
+
+  # PCE topology — XR native YANG (xrd-7 only)
+  # topology-summary not available; topology-nodes confirmed working on XRd 25.3.1
+  xrd-pce-topology:
+    mode: stream
+    stream-mode: sample
+    sample-interval: 30s
+    paths:
+      - Cisco-IOS-XR-infra-xtc-oper:pce/topology-nodes
+    outputs:
+      - nats-xrd-out
 
 outputs:
-  nats-srl-out:
+  nats-xrd-out:
     type: jetstream
-    name: gnmic-ingress-srl
+    name: gnmic-ingress-xrd
     address: nats:4222
-    stream: srl
+    stream: xrd
     create-stream:
       retention-policy: workqueue
-      description: srl telemetry data to be processed mid pipeline
+      description: xrd telemetry data to be processed mid pipeline
       subjects: []
       storage: memory
-      max-bytes: 2000000000
-    subject-format: subscription.target
-    connect-time-wait: 2s
-    format: event
-    split-events: false
-    override-timestamps: false
-    num-workers: 1
-    write-timeout: 5s
-    debug: false
-    buffer-size: 0
-    enable-metrics: true
-    event-processors: []
-
-  nats-eos-out:
-    type: jetstream
-    name: gnmic-ingress-eos
-    address: nats:4222
-    stream: eos
-    create-stream:
-      retention-policy: workqueue
-      description: eos telemetry data to be processed mid pipeline
-      subjects: []
-      storage: memory
-      max-bytes: 2000000000
+      max-bytes: 268435456
     subject-format: subscription.target
     connect-time-wait: 2s
     format: event

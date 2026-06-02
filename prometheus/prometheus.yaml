@@ -1,23 +1,32 @@
+global:
+  scrape_interval: 10s
+  evaluation_interval: 10s
+
 scrape_configs:
   - job_name: prometheus
     honor_timestamps: true
-    scrape_interval: 15s
+    scrape_interval: 10s
     scrape_timeout: 5s
     metrics_path: /metrics
     scheme: http
     static_configs:
       - targets:
-        - localhost:9090
+          - localhost:9090
   - job_name: gnmic
     static_configs:
       - targets:
-        - gnmic-ingestor:7890
-        - gnmic-emitter:7890
+          - gnmic-ingestor:7890
+          - gnmic-emitter:7890
   - job_name: nats
     static_configs:
       - targets:
-        - nats-exporter:7777
-#  - job_name: clickhouse
-#    static_configs:
-#      - targets:
-#        - clab-gnp-stack-clickhouse:9363
+          - nats-exporter:7777
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+            - alertmanager:9093
+
+rule_files:
+  - /etc/prometheus/rules/*.yaml

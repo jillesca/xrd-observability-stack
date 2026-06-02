@@ -1,0 +1,145 @@
+groups:
+  - name: xrd-interface-alerts
+    interval: 5s
+    rules:
+      # SC-01 — Physical interface operationally DOWN (non-loopback, non-management)
+      # Source label: the gNMIc target name (e.g. "xrd-1")
+      # Name label: the interface name (e.g. "GigabitEthernet0/0/0/0")
+      # Verified metric: openconfig_interfaces_interface_state_oper_status (value 1=UP, 0=DOWN)
+      - alert: XRdInterfaceDown
+        expr: >
+          openconfig_interfaces_interface_state_oper_status{
+            name!~"Loopback.*|MgmtEth.*"
+          } < 1
+        for: 0s
+        labels:
+          severity: critical
+          event_type: interface_state
+          affected_object_type: interface
+        annotations:
+          summary: "Interface {{ $labels.name }} on {{ $labels.source }} is DOWN"
+          description: >
+            Interface {{ $labels.name }} on {{ $labels.source }} is operationally
+            DOWN (oper_status={{ $value }}).
+
+  - name: xrd-isis-alerts
+    interval: 5s
+    rules:
+      # SC-01 cascade — Count of ISIS adjacencies NOT in UP state.
+      # Alertmanager inhibit_rules suppress this when XRdInterfaceDown fires for the
+      # same source device (see alertmanager.yaml inhibit_rules).
+      # Uses "isis_adjacency_count" event_type so inhibition can target it precisely.
+      # Verified metric: Cisco_IOS_XR_clns_isis_oper_isis_instances_instance_neighbors_neighbor_neighbor_state
+      # UP state string label value: "isis-adj-1-state"
+      - alert: XRdISISAdjacencyDown
+        expr: >
+          (
+            count(
+              Cisco_IOS_XR_clns_isis_oper_isis_instances_instance_neighbors_neighbor_neighbor_state{
+                neighbor_state!="isis-adj-1-state"
+              }
+            ) or vector(0)
+          ) > 0
+        for: 5s
+        labels:
+          severity: warning
+          event_type: isis_adjacency_count
+          affected_object_type: isis_adjacency
+          protocol: isis
+        annotations:
+          summary: "{{ $value }} ISIS adjacencies not UP"
+          description: >
+            {{ $value }} ISIS adjacency entries are not in UP state across all devices.
+
+      # SC-09 — Multiple adjacencies lost simultaneously (topology-level event).
+      # This does NOT get inhibited by XRdInterfaceDown — it indicates a wider failure
+      # (device down, not just one link). The threshold of 3 means at least one full
+      # device is isolated from its neighbors.
+      - alert: XRdTopologyDegraded
+        expr: >
+          (
+            count(
+              Cisco_IOS_XR_clns_isis_oper_isis_instances_instance_neighbors_neighbor_neighbor_state{
+                neighbor_state!="isis-adj-1-state"
+              }
+            ) or vector(0)
+          ) >= 3
+        for: 10s
+        labels:
+          severity: critical
+          event_type: topology_degraded
+          affected_object_type: topology
+          protocol: isis
+        annotations:
+          summary: "Topology degraded: {{ $value }} ISIS adjacencies down"
+          description: >
+            {{ $value }} ISIS adjacencies are not UP simultaneously — possible device
+            failure or network partitioning event.
+
+  - name: xrd-bgp-alerts
+    interval: 10s
+    rules:
+      # SC-02 — BGP session not ESTABLISHED.
+      # Verified metric: Cisco_IOS_XR_ipv4_bgp_oper_bgp_instances_instance_instance_active_default_vrf_neighbors_neighbor_connection_state
+      # connection_state == 1 means bgp-st-estab (ESTABLISHED); all other values mean not established.
+      - alert: XRdBGPSessionDown
+        expr: >
+          Cisco_IOS_XR_ipv4_bgp_oper_bgp_instances_instance_instance_active_default_vrf_neighbors_neighbor_connection_state
+          != 1
+        for: 15s
+        labels:
+          severity: critical
+          event_type: bgp_session_state
+          affected_object_type: bgp_neighbor
+          protocol: bgp
+          network_instance: default
+        annotations:
+          summary: "BGP session down: {{ $labels.source }} -> {{ $labels.neighbor_neighbor_address }}"
+          description: >
+            BGP neighbor {{ $labels.neighbor_neighbor_address }} on {{ $labels.source }} is not
+            ESTABLISHED (connection_state={{ $value }}).
+
+  - name: xrd-interface-stability
+    interval: 10s
+    rules:
+      # SC-03 — Interface flapping: more than 3 state changes in 5 minutes.
+      # Alertmanager inhibit_rules suppress this when XRdInterfaceDown fires for the
+      # same source+name (clean shutdown is not a flap event).
+      # Verified metric: openconfig_interfaces_interface_state_oper_status
+      - alert: XRdInterfaceFlapping
+        expr: >
+          changes(
+            openconfig_interfaces_interface_state_oper_status{
+              name!~"Loopback.*|MgmtEth.*"
+            }[5m]
+          ) > 3
+        for: 0s
+        labels:
+          severity: warning
+          event_type: interface_flapping
+          affected_object_type: interface
+        annotations:
+          summary: "Interface flapping: {{ $labels.source }} - {{ $labels.name }}"
+          description: >
+            Interface {{ $labels.name }} on {{ $labels.source }} changed state more
+            than 3 times in the last 5 minutes.
+
+      # SC-04 — High interface error rate (physical-layer issue while interface UP).
+      # Verified metric: openconfig_interfaces_interface_state_counters_in_errors
+      - alert: XRdInterfaceHighErrorRate
+        expr: >
+          rate(
+            openconfig_interfaces_interface_state_counters_in_errors{
+              name!~"Loopback.*|MgmtEth.*"
+            }[5m]
+          ) > 10
+        for: 30s
+        labels:
+          severity: warning
+          event_type: interface_errors
+          affected_object_type: interface
+        annotations:
+          summary: "High error rate: {{ $labels.source }} - {{ $labels.name }}"
+          description: >
+            Interface {{ $labels.name }} on {{ $labels.source }} is receiving
+            {{ $value | printf "%.2f" }} errors/sec.

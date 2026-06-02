@@ -15,6 +15,7 @@ deleteDatasources:
 datasources:
   - name: Prometheus
     type: prometheus
+    uid: prometheus
     orgId: 1
     url: http://prometheus:9090
     password:
@@ -26,4 +27,25 @@ datasources:
     withCredentials:
     isDefault: true
     version: 1
+    editable: true
+
+  - name: Loki
+    type: loki
+    uid: loki
+    orgId: 1
+    url: $LOKI_URL
+    basicAuth: false
+    isDefault: false
+    version: 1
+    editable: true
+
+  - name: Alertmanager
+    type: alertmanager
+    uid: alertmanager
+    orgId: 1
+    url: http://alertmanager:9093
+    access: proxy
+    jsonData:
+      handleGrafanaManagedAlerts: false
+      implementation: prometheus
     editable: true

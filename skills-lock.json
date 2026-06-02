@@ -1,0 +1,59 @@
+{
+  "version": 1,
+  "skills": {
+    "alerting-irm": {
+      "source": "grafana/skills",
+      "sourceType": "github",
+      "skillPath": "skills/grafana-core/alerting-irm/SKILL.md",
+      "computedHash": "c1d7a3a007a7d31080877c0e764f6364cd8c30633cd5303958eb223d81628cff"
+    },
+    "alloy": {
+      "source": "grafana/skills",
+      "sourceType": "github",
+      "skillPath": "skills/grafana-core/alloy/SKILL.md",
+      "computedHash": "78df273fe36b1ebd2a8704f3765c1f1b9354de325d344d7517477d3262812e17"
+    },
+    "beyla": {
+      "source": "grafana/skills",
+      "sourceType": "github",
+      "skillPath": "skills/grafana-core/beyla/SKILL.md",
+      "computedHash": "7fbbfa7d99c32efab65c1decdf26971753a3107cdb2550faf67ff20f3c0646f3"
+    },
+    "dashboarding": {
+      "source": "grafana/skills",
+      "sourceType": "github",
+      "skillPath": "skills/grafana-core/dashboarding/SKILL.md",
+      "computedHash": "d8b1a6b7b8e7796fc8fc0eacda974a6c6c61594d848e5b3f30df837112ead839"
+    },
+    "grafana-oss": {
+      "source": "grafana/skills",
+      "sourceType": "github",
+      "skillPath": "skills/grafana-core/grafana-oss/SKILL.md",
+      "computedHash": "5c8eea18b8d034bbee78badf8524433106563d124489d06b1ff577df6deacf07"
+    },
+    "loki": {
+      "source": "grafana/skills",
+      "sourceType": "github",
+      "skillPath": "skills/grafana-lgtm/loki/SKILL.md",
+      "computedHash": "0c83822f226a02921e12cecb35f1270d89744a782895690d4a4e8904588fb07c"
+    },
+    "opentelemetry": {
+      "source": "grafana/skills",
+      "sourceType": "github",
+      "skillPath": "skills/grafana-core/opentelemetry/SKILL.md",
+      "computedHash": "7726c7e8b48f15a846f22bf1c8af710095c033cf3f8f5440c2284321ec0fc205"
+    },
+    "prometheus": {
+      "source": "grafana/skills",
+      "sourceType": "github",
+      "skillPath": "skills/grafana-lgtm/prometheus/SKILL.md",
+      "computedHash": "af178807f5de588da30af031398753d794ce645b42eb7348567288479aa23d77"
+    },
+    "promql": {
+      "source": "grafana/skills",
+      "sourceType": "github",
+      "skillPath": "skills/grafana-core/promql/SKILL.md",
+      "computedHash": "81d1df0ad4d81f51ef9ac71e4e63e9a67a8423a7cd4fbb73efee25a7a22cb8ba"
+    }
+  }
+}

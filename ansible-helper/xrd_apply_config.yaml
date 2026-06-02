@@ -1,0 +1,31 @@
+---
+- name: Add logging configuration to XRd DevNet Sandbox.
+  hosts: xr
+  gather_facts: false
+
+  vars:
+    ansible_command_timeout: 60
+    # Disable platform detection to avoid 'show inventory' command
+    ansible_network_os: cisco.iosxr.iosxr
+    ansible_iosxr_use_proxy: false
+    # Force disable facts gathering and platform detection
+    ansible_gather_subset: "!all"
+    ansible_facts_modules: []
+    # Skip device platform detection entirely
+    ansible_iosxr_skip_platform_detection: true
+    # Syslog destination for XRd devices.
+    # VM split mode (Alloy on VM macvlan): 10.10.20.11 (default)
+    # Laptop mode (Alloy on laptop):       override with -e syslog_destination=192.168.254.11
+    syslog_destination: "{{ lookup('env', 'SYSLOG_DESTINATION') | default('10.10.20.11', true) }}"
+    syslog_port: "{{ lookup('env', 'SYSLOG_PORT') | default('5514', true) }}"
+
+  tasks:
+    - name: Configure logging hostname prefix
+      cisco.iosxr.iosxr_config:
+        lines:
+          - logging hostnameprefix {{ inventory_hostname }}
+          - logging format rfc5424
+          - logging {{ syslog_destination }} port {{ syslog_port }}
+          - logging source-interface  MgmtEth0/RP0/CPU0/0
+          - logging monitor debugging
+        backup: no

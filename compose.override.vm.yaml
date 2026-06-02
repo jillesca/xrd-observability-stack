@@ -1,0 +1,52 @@
+# VM-mode overlay. Used with: make up-vm (= docker compose -f compose.yaml -f compose.override.vm.yaml up -d)
+# Runs the FULL stack on the VM: adds Alloy (syslog) + Loki (local) + macvlan networking.
+# Requires the segment-routing_mgmt macvlan network to exist on the Docker host.
+# Do not use on a laptop — that network does not exist there.
+#
+# For split mode (Alloy+Loki on VM, rest on laptop): use `make vm-deploy` + `make up`
+
+networks:
+  xrd-mgmt:
+    external: true
+    name: segment-routing_mgmt
+
+services:
+  # Loki runs locally in full-VM mode (override: base compose no longer includes it)
+  loki:
+    image: grafana/loki:3.5.0
+    ports:
+      - 3100:3100
+    command: -config.file=/etc/loki/loki-config.yaml
+    volumes:
+      - ./loki/loki-config.yaml:/etc/loki/loki-config.yaml:ro
+    networks:
+      - gnp-mgmt
+
+  grafana:
+    environment:
+      - LOKI_URL=http://loki:3100 # local Loki in full-VM mode
+    networks:
+      gnp-mgmt: {} # reaches Prometheus and Loki
+      xrd-mgmt: # accessible from laptop via VPN at 10.10.20.12:3000
+        ipv4_address: ${GRAFANA_MACVLAN_IP:-10.10.20.12}
+    depends_on:
+      - loki
+
+  gnmic-ingestor:
+    networks:
+      gnp-mgmt: {}
+      xrd-mgmt: {} # direct Layer 2 to XRd gNMI endpoints
+
+  alloy:
+    image: grafana/alloy:v1.8.3
+    ports:
+      - 12345:12345 # Alloy UI (debugging)
+    volumes:
+      - ./alloy/config.alloy:/etc/alloy/config.alloy:ro
+    command: run /etc/alloy/config.alloy
+    networks:
+      gnp-mgmt: # reaches Loki
+      xrd-mgmt: # XRd devices push syslog here
+        ipv4_address: ${ALLOY_MACVLAN_IP:-10.10.20.11}
+    depends_on:
+      - loki

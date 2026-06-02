@@ -1,0 +1,49 @@
+# alertmanager/alertmanager.yaml
+# Handles routing, grouping, deduplication, and inhibition for all XRd alerts.
+# See docs/tasks/alert-use-cases.md §Architecture Decision for rationale.
+global:
+  resolve_timeout: 5m
+
+route:
+  receiver: sp_oncall_webhook
+  # Group alerts by the device (source label) and event type.
+  # Alerts sharing both labels within group_wait are bundled into one POST.
+  group_by: [source, event_type]
+  group_wait: 30s
+  group_interval: 5m
+  repeat_interval: 4h
+
+  routes:
+    # SC-09 (topology_degraded) is topology-scoped, not per-device.
+    # Group only by event_type so all devices contribute to one notification.
+    - matchers:
+        - event_type = "topology_degraded"
+      group_by: [event_type]
+      receiver: sp_oncall_webhook
+
+receivers:
+  - name: sp_oncall_webhook
+    webhook_configs:
+      - url: "http://webhook-receiver:8080/alert"
+        send_resolved: true
+
+  - name: null_receiver
+    # Intentionally empty — used to silently discard suppressed alerts.
+
+inhibit_rules:
+  # SC-01 (interface_state) suppresses SC-01-cascade (isis_adjacency_count) for the
+  # same device. ISIS adjacency loss is a known cascade of interface down; the agent
+  # should investigate the interface root cause, not open a second thread for ISIS.
+  - source_matchers:
+      - event_type = "interface_state"
+    target_matchers:
+      - event_type = "isis_adjacency_count"
+    equal: [source]
+
+  # SC-01 (interface_state) suppresses SC-03 (interface_flapping) for the same
+  # device+interface. A clean shutdown is not instability.
+  - source_matchers:
+      - event_type = "interface_state"
+    target_matchers:
+      - event_type = "interface_flapping"
+    equal: [source, name]

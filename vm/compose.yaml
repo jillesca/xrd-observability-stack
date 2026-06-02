@@ -1,0 +1,42 @@
+# Standalone syslog stack for the remote VM.
+# Runs Alloy (receives XRd syslog via macvlan) and Loki (stores logs).
+# Grafana on the laptop queries Loki remotely at VM_HOST:3100.
+#
+# Deploy from the laptop with: make vm-deploy
+# Start/stop with:             make vm-start / make vm-stop
+#
+# Env vars (set in a .env file next to this compose or export in shell):
+#   ALLOY_MACVLAN_IP  IP assigned to Alloy on the XRd macvlan (default: 10.10.20.11)
+#   SYSLOG_PORT       Syslog listener port (default: 5514)
+
+networks:
+  gnp-syslog:
+    driver: bridge
+  xrd-mgmt:
+    external: true
+    name: segment-routing_mgmt
+
+services:
+  loki:
+    image: grafana/loki:3.5.0
+    ports:
+      - "3100:3100" # Queried remotely by Grafana on the laptop
+    command: -config.file=/etc/loki/loki-config.yaml
+    volumes:
+      - ../loki/loki-config.yaml:/etc/loki/loki-config.yaml:ro
+    networks:
+      - gnp-syslog
+
+  alloy:
+    image: grafana/alloy:v1.8.3
+    ports:
+      - "12345:12345" # Alloy UI
+    volumes:
+      - ../alloy/config.alloy:/etc/alloy/config.alloy:ro
+    command: run --server.http.listen-addr=0.0.0.0:12345 /etc/alloy/config.alloy
+    networks:
+      gnp-syslog: {} # reaches Loki by service name
+      xrd-mgmt: # XRd devices push syslog here
+        ipv4_address: ${ALLOY_MACVLAN_IP:-10.10.20.11}
+    depends_on:
+      - loki
