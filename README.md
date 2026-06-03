@@ -90,7 +90,7 @@ flowchart LR
 | xrd-7  | PCE       | 10.10.20.107  | 57777     |
 | xrd-8  | vRR       | 10.10.20.108  | 57777     |
 
-XRd runs on a Cisco DevNet sandbox VM (`10.10.20.15`) via Docker macvlan (`segment-routing_mgmt`).
+XRd runs on a [Cisco DevNet sandbox](https://devnetsandbox.cisco.com/DevNet) VM (`10.10.20.15`) via Docker macvlan (`segment-routing_mgmt`).
 
 ## Stack components
 
