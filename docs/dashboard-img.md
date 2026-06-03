@@ -6,9 +6,9 @@ Here are some images of the dashboard for reference:
 
 ![summary](../img/1-summary.png)
 
-## Link and Logs
+## Links and Logs
 
-![link-and-logs](../img/2-link-logs.png)
+![links-and-logs](../img/2-links-logs.png)
 
 ## Interfaces
 
