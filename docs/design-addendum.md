@@ -216,7 +216,7 @@ This requires adding a new gNMI subscription path. Follow these steps in order:
 **Step 1 — Verify the path works on XRd 25.3.1:**
 
 ```bash
-docker exec gnmic-ingestor gnmic -a 10.10.20.101:57777 -u cisco -p C1sco12345 --insecure get \
+docker exec gnmic-ingestor gnmic -a 10.10.20.101:57400 -u cisco -p C1sco12345 --insecure get \
   --path "Cisco-IOS-XR-ipv4-bgp-oper:bgp/instances/instance[instance-name=default]/instance-active/default-vrf/neighbors/neighbor[neighbor-address=100.100.100.107]/af-data"
 ```
 

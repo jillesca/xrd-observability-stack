@@ -4,7 +4,7 @@ log: true
 username: cisco
 password: C1sco12345
 insecure: true
-port: 57777
+port: 57400
 encoding: json_ietf
 
 targets:
