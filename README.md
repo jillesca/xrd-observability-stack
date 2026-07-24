@@ -37,7 +37,7 @@ flowchart LR
         graf["Grafana<br/>:3000"]
     end
 
-    xrd -->|"gNMI :57777"| ingestor
+    xrd -->|"gNMI :57400"| ingestor
     ingestor --> nats --> emitter -->|remote_write| prom
     prom -->|metrics| graf
     loki -->|logs| graf
@@ -62,7 +62,7 @@ flowchart LR
     am -->|"POST /alert"| wh
     wh --> sp
     sp <-->|gNMI queries| buddy
-    buddy -->|"gNMI :57777"| xrd
+    buddy -->|"gNMI :57400"| xrd
 ```
 
 ## Topology
@@ -81,14 +81,14 @@ flowchart LR
 
 | Device | Role      | Management IP | gNMI Port |
 | ------ | --------- | ------------- | --------- |
-| xrd-1  | PE / Edge | 10.10.20.101  | 57777     |
-| xrd-2  | PE / Edge | 10.10.20.102  | 57777     |
-| xrd-3  | P / Core  | 10.10.20.103  | 57777     |
-| xrd-4  | P / Core  | 10.10.20.104  | 57777     |
-| xrd-5  | P / Core  | 10.10.20.105  | 57777     |
-| xrd-6  | P / Core  | 10.10.20.106  | 57777     |
-| xrd-7  | PCE       | 10.10.20.107  | 57777     |
-| xrd-8  | vRR       | 10.10.20.108  | 57777     |
+| xrd-1  | PE / Edge | 10.10.20.101  | 57400     |
+| xrd-2  | PE / Edge | 10.10.20.102  | 57400     |
+| xrd-3  | P / Core  | 10.10.20.103  | 57400     |
+| xrd-4  | P / Core  | 10.10.20.104  | 57400     |
+| xrd-5  | P / Core  | 10.10.20.105  | 57400     |
+| xrd-6  | P / Core  | 10.10.20.106  | 57400     |
+| xrd-7  | PCE       | 10.10.20.107  | 57400     |
+| xrd-8  | vRR       | 10.10.20.108  | 57400     |
 
 XRd runs on a [Cisco DevNet sandbox](https://devnetsandbox.cisco.com/DevNet) VM (`10.10.20.15`) via Docker macvlan (`segment-routing_mgmt`).
 
